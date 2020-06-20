@@ -3,5 +3,6 @@
 
     <string name="main_start">Start</string>
     <string name="main_stop">Stop</string>
-    <string name="location_default">Location…</string>
+    <string name="location_hint">Last found Location…</string>
+    <string name="found_wifi_networks_hint">Found WIFI Networks…</string>
 </resources>

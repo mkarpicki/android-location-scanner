@@ -3,6 +3,7 @@
     package="com.karpicki.locationscanner">
 
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -23,6 +24,7 @@
         </activity>
 
         <service android:name=".GPSService" />
+        <service android:name=".WIFIService" />
     </application>
 
 </manifest>

@@ -1,5 +1,6 @@
 package com.karpicki.locationscanner
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Service
 import android.content.Intent
@@ -10,13 +11,10 @@ import android.os.Bundle
 import android.os.IBinder
 import android.provider.Settings
 
-//https://stackoverflow.com/questions/49182661/get-wifi-scan-results-list-with-kotlin
-//https://www.youtube.com/watch?v=lvcGh2ZgHeA
-
 class GPSService : Service() {
 
     private lateinit var locationListener: LocationListener
-    private var locationManager: LocationManager? = null
+    private lateinit var locationManager: LocationManager
 
     override fun onBind(p0: Intent?): IBinder? {
         TODO("Not yet implemented")
@@ -42,17 +40,13 @@ class GPSService : Service() {
             }
         }
         // permissions enforced in Activity, so check can be skipped
-        locationManager = getSystemService(LOCATION_SERVICE) as LocationManager?
-
-        locationManager?.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 3000L, 0f, locationListener)
-        //TODO("change minDistance to 5 (meters)")
+        locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 3000L, 0f, locationListener)
         //TODO("pass both minValues from UI")
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        if (locationManager != null) {
-            locationManager?.removeUpdates(locationListener)
-        }
+        locationManager.removeUpdates(locationListener)
     }
 }
