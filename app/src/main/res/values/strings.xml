@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">LocationScanner</string>
+
+    <string name="main_start">Start</string>
+    <string name="main_stop">Stop</string>
+    <string name="location_default">Location…</string>
+</resources>
