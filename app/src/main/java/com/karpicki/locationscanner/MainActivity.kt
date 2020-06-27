@@ -7,8 +7,8 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.location.Location
-import android.net.wifi.ScanResult
-import android.os.Build
+import android.net.wifi.ScanResult as WIFIScanResult
+import android.bluetooth.le.ScanResult as BTScanResult
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.core.content.ContextCompat
@@ -23,7 +23,8 @@ class MainActivity : AppCompatActivity() {
     private var broadcastReceiver: BroadcastReceiver? = null
 
     private var lastLocation: Location? = null
-    private var lastWifiList: ArrayList<ScanResult> = ArrayList<ScanResult>()
+    private var lastWifiList: ArrayList<WIFIScanResult> = ArrayList()
+    private var lastBTDevices: ArrayList<BTScanResult> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,26 +52,22 @@ class MainActivity : AppCompatActivity() {
                         "wifi_scan_update" -> {
                             lastWifiList.clear()
                             val wifiList = intent.extras?.get("wifi_results") as ArrayList<*>
-                            wifiList.forEach { wifiNetwork -> lastWifiList.add(wifiNetwork as ScanResult) }
+                            wifiList.forEach { wifiNetwork -> lastWifiList.add(wifiNetwork as WIFIScanResult) }
                             displayWIFINetworks(lastWifiList)
+                        }
+                        "bt_scan_update" -> {
 
+                            if (lastBTDevices.size > 10) {
+                                lastBTDevices.clear()
+                            }
+
+                            val btList = intent.extras?.get("bt_results") as ArrayList<*>
+                            btList.forEach { btDevice ->  lastBTDevices.add(btDevice as BTScanResult) }
+                            displayBTDevices(lastBTDevices)
                         }
                     }
-//
-//                    if (intent?.action == "location_update") {
-//                        val location = intent?.extras?.get("location") as Location
-//                        lastLocation = location
-//                        displayLocation(location)
-//                    }
                 }
             }
-//            val locationIntentFilter: IntentFilter = IntentFilter("location_update")
-//            val wifiIntentFilter : IntentFilter = IntentFilter("wifi_update")
-//            val btIntentFilter : IntentFilter = IntentFilter("bt_update")
-//
-//            registerReceiver(broadcastReceiver, locationIntentFilter)
-//            registerReceiver(broadcastReceiver, wifiIntentFilter)
-//            registerReceiver(broadcastReceiver, btIntentFilter)
 
             val intentFilter = IntentFilter()
             intentFilter.addAction("location_update")
@@ -115,6 +112,9 @@ class MainActivity : AppCompatActivity() {
 
             val wifiIntent = Intent(applicationContext, WIFIService::class.java)
             startService(wifiIntent)
+
+            val btIntent = Intent(applicationContext, BTService::class.java)
+            startService(btIntent)
         }
 
         binding.mainButtonStop.setOnClickListener {
@@ -123,6 +123,9 @@ class MainActivity : AppCompatActivity() {
 
             val wifiIntent = Intent(applicationContext, WIFIService::class.java)
             stopService(wifiIntent)
+
+            val btIntent = Intent(applicationContext, BTService::class.java)
+            stopService(btIntent)
         }
     }
 
@@ -131,31 +134,35 @@ class MainActivity : AppCompatActivity() {
         binding.lastLocationText.text = "${location.latitude} ${location.longitude}"
     }
 
-    private fun displayWIFINetworks(list: ArrayList<ScanResult>) {
+    private fun displayWIFINetworks(list: ArrayList<WIFIScanResult>) {
         var listAsString = ""
 
-//        list.sortBy { item1 ->
-//            item1.level
-//        }
+        list.sortedWith(compareBy { it.level })
 
         list.forEach { item ->
-            listAsString = listAsString.plus(item.SSID).plus("\n")
+            listAsString = listAsString.plus("${item.SSID} (${item.BSSID}) \n")
         }
         binding.lastWifiNetworks.text = listAsString
     }
 
+    private fun displayBTDevices(list: ArrayList<BTScanResult>) {
+        var listAsString = ""
+
+        list.forEach { item ->
+            listAsString = listAsString.plus("${item.device.name} (${item.device.address}) \n")
+        }
+        binding.lastBtDevices.text = listAsString
+    }
+
     private fun runtimePermissions(): Boolean {
-        if (Build.VERSION.SDK_INT >= 23
-                && (
-                        ContextCompat.checkSelfPermission(
-                                this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                        || ContextCompat.checkSelfPermission(
-                        this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
-//                      || ContextCompat.checkSelfPermission(
-//                          this, android.Manifest.permission.ACCESS_WIFI_STATE) != PackageManager.PERMISSION_GRANTED
-                        || ContextCompat.checkSelfPermission(
-                        this, android.Manifest.permission.CHANGE_WIFI_STATE) != PackageManager.PERMISSION_GRANTED
-                        )
+        //if (Build.VERSION.SDK_INT >= 23
+        if (ContextCompat.checkSelfPermission(
+                this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+            || ContextCompat.checkSelfPermission(
+                this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+            || ContextCompat.checkSelfPermission(
+                this, android.Manifest.permission.CHANGE_WIFI_STATE) != PackageManager.PERMISSION_GRANTED
+
         ) {
             requestPermissions(arrayOf(
                     android.Manifest.permission.ACCESS_FINE_LOCATION,
