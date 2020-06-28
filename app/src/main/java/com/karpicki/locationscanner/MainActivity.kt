@@ -115,6 +115,9 @@ class MainActivity : AppCompatActivity() {
 
             val btIntent = Intent(applicationContext, BTService::class.java)
             startService(btIntent)
+
+            val syncIntent = Intent(applicationContext, SyncService::class.java)
+            startService(syncIntent)
         }
 
         binding.mainButtonStop.setOnClickListener {
@@ -126,6 +129,9 @@ class MainActivity : AppCompatActivity() {
 
             val btIntent = Intent(applicationContext, BTService::class.java)
             stopService(btIntent)
+
+            val syncIntent = Intent(applicationContext, SyncService::class.java)
+            stopService(syncIntent)
         }
     }
 
@@ -148,8 +154,15 @@ class MainActivity : AppCompatActivity() {
     private fun displayBTDevices(list: ArrayList<BTScanResult>) {
         var listAsString = ""
 
+        list.sortedWith(compareBy { it.rssi })
+
         list.forEach { item ->
-            listAsString = listAsString.plus("${item.device.name} (${item.device.address}) \n")
+            var line = item.device.address
+
+            if (item.device.name != null) {
+                line = line.plus(" (${item.device.name})")
+            }
+            listAsString = listAsString.plus("$line \n")
         }
         binding.lastBtDevices.text = listAsString
     }

@@ -27,6 +27,7 @@
         <service android:name=".GPSService" />
         <service android:name=".WIFIService" />
         <service android:name=".BTService" />
+        <service android:name=".SyncService" />
     </application>
 
 </manifest>
