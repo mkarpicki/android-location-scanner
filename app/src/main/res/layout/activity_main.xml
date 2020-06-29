@@ -24,26 +24,32 @@
         <TextView
             android:id="@+id/last_wifi_networks"
             android:layout_width="325dp"
-            android:layout_height="wrap_content"
+            android:layout_height="250dp"
             android:layout_marginTop="16dp"
+            android:background="#000000"
             android:hint="@string/found_wifi_networks_hint"
+            android:scrollbars="vertical"
+            android:textColor="#4CAF50"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.108" />
+            app:layout_constraintVertical_bias="0.139" />
 
         <TextView
             android:id="@+id/last_bt_devices"
             android:layout_width="325dp"
-            android:layout_height="wrap_content"
+            android:layout_height="250dp"
             android:layout_marginTop="16dp"
+            android:background="#040404"
             android:hint="@string/found_bt_devices_hint"
+            android:scrollbars="vertical"
+            android:textColor="#4CAF50"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.172" />
+            app:layout_constraintVertical_bias="0.748" />
 
         <LinearLayout
             android:layout_width="match_parent"

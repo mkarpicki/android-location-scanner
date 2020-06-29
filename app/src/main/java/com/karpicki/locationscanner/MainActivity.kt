@@ -56,13 +56,21 @@ class MainActivity : AppCompatActivity() {
                             displayWIFINetworks(lastWifiList)
                         }
                         "bt_scan_update" -> {
+                            val btList = intent.extras?.get("bt_results") as ArrayList<*>
 
                             if (lastBTDevices.size > 10) {
                                 lastBTDevices.clear()
                             }
 
-                            val btList = intent.extras?.get("bt_results") as ArrayList<*>
-                            btList.forEach { btDevice ->  lastBTDevices.add(btDevice as BTScanResult) }
+                            btList.forEach { btDevice ->
+                                val item = btDevice as BTScanResult
+                                val foundBtDevice: BTScanResult? = lastBTDevices.find {
+                                    it.device.address == item.device.address
+                                }
+                                if (foundBtDevice == null) {
+                                    lastBTDevices.add(btDevice)
+                                }
+                            }
                             displayBTDevices(lastBTDevices)
                         }
                     }
