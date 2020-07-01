@@ -17,12 +17,43 @@ class SyncService: Service() {
     private var lastLocation: Location? = null
     private var lastSyncLocation: Location? = null
     //private var lastWifiList: ArrayList<WIFIScanResult> = ArrayList()
-    //private var lastBTDevices: ArrayList<BTScanResult> = ArrayList()
+    private var syncedBTDevices: ArrayList<BTScanResult> = ArrayList()
+
+    private fun sendBTDevices(list: ArrayList<BTScanResult>) {
+//        val request = Request.Builder()
+//            .url(url)
+//            .build()
+//
+//        client.newCall(request).enqueue(object : Callback {
+//            override fun onFailure(call: Call, e: IOException) {}
+//            override fun onResponse(call: Call, response: Response) = println(response.body()?.string())
+//        })
+    }
 
     private fun syncBTDevices(list: ArrayList<BTScanResult>) {
         //check if device(s) already sync ofr this location / so keep in some Hash
         //which not yet -> sync
         //update lastSyncLocation
+        var btDevicesToSync: ArrayList<BTScanResult> = ArrayList()
+
+        if (lastSyncLocation != lastLocation) {
+            syncedBTDevices.clear()
+            btDevicesToSync = list
+        } else {
+
+            list.forEach { item ->
+                val foundBtDevice: BTScanResult? = syncedBTDevices.find {
+                    it.device.address == item.device.address
+                }
+                if (foundBtDevice == null) {
+                    btDevicesToSync.add(item)
+                }
+            }
+        }
+        if (btDevicesToSync.size > 0) {
+            syncedBTDevices.addAll(btDevicesToSync)
+            sendBTDevices(btDevicesToSync)
+        }
     }
 
     private fun syncWIFINetworks(list: ArrayList<WIFIScanResult>) {
@@ -49,14 +80,13 @@ class SyncService: Service() {
                         "location_update" -> {
                             val location = intent.extras?.get("location") as Location
                             lastLocation = location
-
                         }
                         "wifi_scan_update" -> {
                             val wifiList = intent.extras?.get("wifi_results") as ArrayList<*>
-                            val foundWifiList: ArrayList<WIFIScanResult> = ArrayList()
+                            val foundWifNetworks: ArrayList<WIFIScanResult> = ArrayList()
 
-                            wifiList.forEach { wifiNetwork -> foundWifiList.add(wifiNetwork as WIFIScanResult) }
-                            syncWIFINetworks(foundWifiList)
+                            wifiList.forEach { wifiNetwork -> foundWifNetworks.add(wifiNetwork as WIFIScanResult) }
+                            syncWIFINetworks(foundWifNetworks)
                         }
                         "bt_scan_update" -> {
                             val btList = intent.extras?.get("bt_results") as ArrayList<*>
