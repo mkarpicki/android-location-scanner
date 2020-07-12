@@ -10,6 +10,13 @@ import android.net.wifi.ScanResult as WIFIScanResult
 import android.bluetooth.le.ScanResult as BTScanResult
 import android.os.IBinder
 
+import java.io.IOException;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
 class SyncService: Service() {
 
     private var broadcastReceiver: BroadcastReceiver? = null
@@ -19,7 +26,42 @@ class SyncService: Service() {
     //private var lastWifiList: ArrayList<WIFIScanResult> = ArrayList()
     private var syncedBTDevices: ArrayList<BTScanResult> = ArrayList()
 
+    private val mediaType: MediaType? = MediaType.parse("application/json; charset=utf-8");
+    //private val BT_API = "http://192.168.0.14:9001/2015-03-31/functions/myfunction/invocations"
+    private val btAPI = "https://1gxncmwlei.execute-api.eu-west-1.amazonaws.com/test/devices/bt"
+    private val apiKey = "____"
+
     private fun sendBTDevices(list: ArrayList<BTScanResult>) {
+
+        Thread {
+            // TODO - move to own class with vals used
+            var json = "{\"location\":{\"latitude\":52.1, \"longitude\":13.1}, \"devices\":[{\"address\": \"as:zx:as:12:22:zz\"}]}"
+            val client: OkHttpClient = OkHttpClient();
+            val body: RequestBody = RequestBody.create(mediaType, json)
+
+            val request: Request = Request.Builder()
+                .url(btAPI)
+                .post(body)
+                .header("x-api-key", apiKey)
+                .build()
+
+            val response: Response = client.newCall(request).execute()
+
+            response.body()?.string()
+
+        }.start()
+
+//        String post(String url, String json) throws IOException {
+//            RequestBody body = RequestBody.create(json, JSON);
+//            Request request = new Request.Builder()
+//                .url(url)
+//                .post(body)
+//                .build();
+//            try (Response response = client.newCall(request).execute()) {
+//                return response.body().string();
+//            }
+//            }
+
 //        val request = Request.Builder()
 //            .url(url)
 //            .build()
