@@ -2,6 +2,18 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
+def getBTStoreApiKey() {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    return properties.getProperty("bt.storage.apiKey")
+}
+
+def getBTStoreHost() {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    return properties.getProperty("bt.storage.host")
+}
+
 android {
     compileSdkVersion 29
 
@@ -13,12 +25,22 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+
     }
 
     buildTypes {
+
+        debug {
+            buildConfigField("String", "BT_STORE_API_KEY", "\""+getBTStoreApiKey()+"\"")
+            buildConfigField("String", "BT_STORE_HOST", "\""+getBTStoreHost()+"\"")
+        }
+
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField("String", "BT_STORE_API_KEY", "\""+getBTStoreApiKey()+"\"")
+            buildConfigField("String", "BT_STORE_HOST", "\""+getBTStoreHost()+"\"")
         }
     }
 

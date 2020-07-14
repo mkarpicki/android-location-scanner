@@ -40,7 +40,7 @@ class BTService: Service() {
 
         override fun onBatchScanResults(results: MutableList<ScanResult>?) {
             super.onBatchScanResults(results)
-            val str = "onBatchScanResults:${results.toString()}"
+            //val str = "onBatchScanResults:${results.toString()}"
         }
 
     }

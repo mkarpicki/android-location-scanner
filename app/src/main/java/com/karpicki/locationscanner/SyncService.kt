@@ -16,6 +16,9 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
+import org.json.JSONArray
+import java.util.*
+import kotlin.collections.ArrayList
 
 class SyncService: Service() {
 
@@ -28,8 +31,6 @@ class SyncService: Service() {
 
     private val mediaType: MediaType? = MediaType.parse("application/json; charset=utf-8");
     //private val BT_API = "http://192.168.0.14:9001/2015-03-31/functions/myfunction/invocations"
-    private val btAPI = "https://1gxncmwlei.execute-api.eu-west-1.amazonaws.com/test/devices/bt"
-    private val apiKey = "____"
 
     private fun sendBTDevices(list: ArrayList<BTScanResult>) {
 
@@ -40,9 +41,9 @@ class SyncService: Service() {
             val body: RequestBody = RequestBody.create(mediaType, json)
 
             val request: Request = Request.Builder()
-                .url(btAPI)
+                .url(BuildConfig.BT_STORE_HOST)
                 .post(body)
-                .header("x-api-key", apiKey)
+                .header("x-api-key", BuildConfig.BT_STORE_API_KEY )
                 .build()
 
             val response: Response = client.newCall(request).execute()
