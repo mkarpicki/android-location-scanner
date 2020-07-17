@@ -1,6 +1,7 @@
 package com.karpicki.locationscanner
 
 import android.bluetooth.le.ScanResult
+import android.location.Location
 import android.os.AsyncTask
 import android.util.Log
 import okhttp3.*
@@ -32,8 +33,29 @@ class BTStoreTask : AsyncTask<String, Int, Int>() {
         return response.code()
     }
 
-    fun stringify(list: ArrayList<ScanResult>): String {
-        var str = ""
-        return str
+    fun stringify(location: Location, list: ArrayList<ScanResult>): String {
+        var strDevices = ""
+        val strLocation = "\"location\": {\"latitude\": ${location.latitude}, \"longitude\": ${location.longitude}}"
+
+        list.forEachIndexed{ index, item ->
+            val address = item.device.address
+            val name = item.device.name
+            val rssi = item.rssi
+            var strItem = ""
+
+            strItem = if (name != null) {
+                " {\"device\": {\"address\": \"$address\", \"name\": \"$name\" }, \"rssi\": $rssi}"
+            } else {
+                " {\"device\": {\"address\": \"$address\" }, \"rssi\": $rssi}"
+            }
+
+            if (index > 0) {
+                strItem = ",$strItem"
+            }
+            strDevices += strItem
+        }
+        strDevices = "\"devices\": [$strDevices]"
+
+        return "{$strLocation, $strDevices}"
     }
 }

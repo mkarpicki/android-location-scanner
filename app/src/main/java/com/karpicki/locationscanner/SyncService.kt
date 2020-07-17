@@ -17,7 +17,7 @@ class SyncService: Service() {
 
     private var broadcastReceiver: BroadcastReceiver? = null
 
-    private val btCollectBuffor: Int = 3 //10
+    private val btCollectBuffor: Int = 100
 
     private var lastLocation: Location? = null
     //private var lastSyncLocation: Location? = null
@@ -25,12 +25,27 @@ class SyncService: Service() {
 
     private var bTDevicesToSync: ArrayList<BTScanResult> = ArrayList()
 
+    private fun getNames (): String {
+        var  str = ""
+
+        bTDevicesToSync.forEach { item ->
+            str += item.device.address + ", "
+        }
+
+        return str
+    }
+
     private fun syncBTDevices(location : Location) {
 
         //var json = "{\"location\":{\"latitude\":52.1, \"longitude\":13.1}, \"devices\":[{\"address\": \"as:zx:as:12:22:zz\"}]}"
         //BTStoreTask().execute(json)
+
+        val btStoreTask = BTStoreTask()
+        val json = btStoreTask.stringify(location, bTDevicesToSync)
+
+        Log.d("TAG", json)
         Log.d("TAG", "save GPD:" + location)
-        Log.d("TAG", "save BT:" + bTDevicesToSync)
+        Log.d("TAG", "save BT:" + getNames())
 
         bTDevicesToSync.clear()
     }
