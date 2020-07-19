@@ -17,45 +17,54 @@ class SyncService: Service() {
 
     private var broadcastReceiver: BroadcastReceiver? = null
 
-    private val btCollectBuffor: Int = 100
+    private val btMaxBufforSize: Int = 25
+    private val wifiMaxBufforSize: Int = 25
 
     private var lastLocation: Location? = null
-    //private var lastSyncLocation: Location? = null
-    //private var lastWifiList: ArrayList<WIFIScanResult> = ArrayList()
 
+    private var wifiDevicesToSync: ArrayList<WIFIScanResult> = ArrayList()
     private var bTDevicesToSync: ArrayList<BTScanResult> = ArrayList()
 
-    private fun getNames (): String {
-        var  str = ""
-
-        bTDevicesToSync.forEach { item ->
-            str += item.device.address + ", "
-        }
-
-        return str
-    }
+//    private fun getNames (): String {
+//        var  str = ""
+//
+//        bTDevicesToSync.forEach { item ->
+//            str += item.device.address + ", "
+//        }
+//
+//        return str
+//    }
 
     private fun syncBTDevices(location : Location) {
 
-        //var json = "{\"location\":{\"latitude\":52.1, \"longitude\":13.1}, \"devices\":[{\"address\": \"as:zx:as:12:22:zz\"}]}"
-        //BTStoreTask().execute(json)
-
         val btStoreTask = BTStoreTask()
         val json = btStoreTask.stringify(location, bTDevicesToSync)
+        //BTStoreTask().execute(json)
 
-        Log.d("TAG", json)
-        Log.d("TAG", "save GPD:" + location)
-        Log.d("TAG", "save BT:" + getNames())
+        Log.d("syncBTDevices", json)
 
         bTDevicesToSync.clear()
     }
 
-    private fun syncWIFINetworks(list: ArrayList<WIFIScanResult>) {
-        //if lastLocation == lastSyncLocation
-        //check if any new WIFI found for lastSyncLocation
-        //sync
-        //update lastSyncLocation
+    private fun syncWIFINetworks(location : Location) {
+        val wifiStoreTask = WIFIStoreTask()
+        val json = wifiStoreTask.stringify(location, wifiDevicesToSync)
+        //BTStoreTask().execute(json)
 
+        Log.d("syncWIFINetworks", json)
+
+        wifiDevicesToSync.clear()
+    }
+
+    private fun collectWIFINetworks(list: ArrayList<WIFIScanResult>) {
+        list.forEach { item ->
+            val foundWIFINetwork : WIFIScanResult? = wifiDevicesToSync.find {
+                it.BSSID == item.BSSID
+            }
+            if (foundWIFINetwork == null) {
+                wifiDevicesToSync.add(item)
+            }
+        }
     }
 
     private fun collectBTDevices (list : ArrayList<BTScanResult>) {
@@ -69,12 +78,18 @@ class SyncService: Service() {
         }
     }
 
+    private fun collectedEnoughWIFINetworks () :Boolean {
+        return (wifiDevicesToSync.size >= wifiMaxBufforSize && lastLocation != null)
+    }
+
+
     private fun collectedEnoughBTDevices () :Boolean {
-        return (bTDevicesToSync.size >= btCollectBuffor && lastLocation != null)
+        return (bTDevicesToSync.size >= btMaxBufforSize && lastLocation != null)
     }
 
     private fun syncAll(location: Location) {
         syncBTDevices(location)
+        syncWIFINetworks(location)
     }
 
     override fun onBind(p0: Intent?): IBinder? {
@@ -100,7 +115,12 @@ class SyncService: Service() {
                             val foundWifNetworks: ArrayList<WIFIScanResult> = ArrayList()
 
                             wifiList.forEach { wifiNetwork -> foundWifNetworks.add(wifiNetwork as WIFIScanResult) }
-                            //syncWIFINetworks(foundWifNetworks)
+
+                            collectWIFINetworks(foundWifNetworks)
+
+                            if (collectedEnoughWIFINetworks()) {
+                                syncWIFINetworks(lastLocation!!)
+                            }
                         }
                         "bt_scan_update" -> {
                             val btList = intent.extras?.get("bt_results") as ArrayList<*>
