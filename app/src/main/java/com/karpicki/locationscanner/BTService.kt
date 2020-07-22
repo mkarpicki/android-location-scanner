@@ -7,16 +7,13 @@ import android.bluetooth.BluetoothManager
 import android.bluetooth.le.BluetoothLeScanner
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
-import android.content.Context
 import android.content.Intent
 import android.os.IBinder
-import java.lang.reflect.Array.get
 
 class BTService: Service() {
 
     private lateinit var bluetoothLeScanner: BluetoothLeScanner
     private var bluetoothAdapter: BluetoothAdapter? = null
-    private lateinit var btDevices: ArrayList<BluetoothDevice>
 
 //    private val bluetoothLeScanner: BluetoothLeScanner
 //        get() {
