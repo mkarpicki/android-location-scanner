@@ -1,6 +1,5 @@
 package com.karpicki.locationscanner
 
-import android.bluetooth.le.ScanResult
 import android.location.Location
 import android.os.AsyncTask
 import android.util.Log
@@ -33,29 +32,44 @@ class BTStoreTask : AsyncTask<String, Int, Int>() {
         return response.code()
     }
 
-    fun stringify(location: Location, list: ArrayList<ScanResult>): String {
-        var strDevices = ""
+    fun stringify(location: Location, list: ArrayList<BLuetoothScanResult>): String {
+
         val strLocation = "\"location\": {\"latitude\": ${location.latitude}, \"longitude\": ${location.longitude}}"
+        val devicesArray = ArrayList<String>()
 
         list.forEachIndexed{ index, item ->
-            val address = item.device.address
-            val name = item.device.name
+            val address = item.scanResult.device.address
+            val name = item.scanResult.device.name
             val rssi = item.rssi
-            var strItem = ""
+            val deviceLocation: Location? = item.location
+            val timestamp = item.timestamp
 
-            strItem = if (name != null) {
-                " {\"device\": {\"address\": \"$address\", \"name\": \"$name\" }, \"rssi\": $rssi}"
+            val deviceStr = if (name != null) {
+                "\"device\": {\"address\": \"$address\", \"name\": \"$name\" }"
             } else {
-                " {\"device\": {\"address\": \"$address\" }, \"rssi\": $rssi}"
+                "\"device\": {\"address\": \"$address\" }"
             }
 
-            if (index > 0) {
-                strItem = ",$strItem"
+            val itemArray = ArrayList<String>()
+
+            itemArray.add("\"rssi\": $rssi")
+
+            if (deviceLocation != null) {
+                itemArray.add("\"location\": {\"latitude\": ${deviceLocation.latitude}, \"longitude\": ${deviceLocation.longitude}}")
             }
-            strDevices += strItem
+            if (timestamp != 0L) {
+                itemArray.add("\"timestamp\": $timestamp")
+            }
+
+            var itemStr = itemArray.joinToString(",")
+
+            itemStr = "{ $itemStr, $deviceStr }"
+
+            devicesArray.add(itemStr)
         }
-        strDevices = "\"devices\": [$strDevices]"
 
-        return "{$strLocation, $strDevices}"
+        val devicesStr = devicesArray.joinToString(",")
+
+        return "{$strLocation, \"devices\": [$devicesStr] }"
     }
 }

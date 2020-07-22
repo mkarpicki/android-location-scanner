@@ -23,7 +23,7 @@ class SyncService: Service() {
     private var lastLocation: Location? = null
 
     private var wifiDevicesToSync: ArrayList<WIFIScanResult> = ArrayList()
-    private var bTDevicesToSync: ArrayList<BTScanResult> = ArrayList()
+    private var bTDevicesToSync: ArrayList<BLuetoothScanResult> = ArrayList()
 
 //    private fun getNames (): String {
 //        var  str = ""
@@ -67,10 +67,10 @@ class SyncService: Service() {
         }
     }
 
-    private fun collectBTDevices (list : ArrayList<BTScanResult>) {
+    private fun collectBTDevices (list : ArrayList<BLuetoothScanResult>) {
         list.forEach { item ->
-            val foundBtDevice: BTScanResult? = bTDevicesToSync.find {
-                it.device.address == item.device.address
+            val foundBtDevice: BLuetoothScanResult? = bTDevicesToSync.find {
+                it.scanResult.device.address == item.scanResult.device.address
             }
             if (foundBtDevice == null) {
                 bTDevicesToSync.add(item)
@@ -124,11 +124,21 @@ class SyncService: Service() {
                         }
                         "bt_scan_update" -> {
                             val btList = intent.extras?.get("bt_results") as ArrayList<*>
-                            val foundBTDevices: ArrayList<BTScanResult> = ArrayList()
 
-                            btList.forEach { btDevice ->  foundBTDevices.add(btDevice as BTScanResult) }
+                            val bluetoothScanResults = ArrayList<BLuetoothScanResult>()
 
-                            collectBTDevices(foundBTDevices)
+                            btList.forEach { btDevice ->
+                                //foundBTDevices.add(btDevice as BTScanResult)
+                                bluetoothScanResults.add(BLuetoothScanResult(
+                                    btDevice as BTScanResult,
+                                    System.currentTimeMillis(),
+                                    btDevice.rssi,
+                                    lastLocation
+                                ))
+
+                            }
+
+                            collectBTDevices(bluetoothScanResults)
 
                             if (collectedEnoughBTDevices()) {
                                 syncBTDevices(lastLocation!!)
