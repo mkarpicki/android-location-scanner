@@ -22,7 +22,7 @@ class SyncService: Service() {
 
     private var lastLocation: Location? = null
 
-    private var wifiDevicesToSync: ArrayList<WIFIScanResult> = ArrayList()
+    private var wifiDevicesToSync: ArrayList<com.karpicki.locationscanner.WIFIScanResult> = ArrayList()
     private var bTDevicesToSync: ArrayList<BLuetoothScanResult> = ArrayList()
 
 //    private fun getNames (): String {
@@ -56,10 +56,10 @@ class SyncService: Service() {
         wifiDevicesToSync.clear()
     }
 
-    private fun collectWIFINetworks(list: ArrayList<WIFIScanResult>) {
+    private fun collectWIFINetworks(list: ArrayList<com.karpicki.locationscanner.WIFIScanResult>) {
         list.forEach { item ->
-            val foundWIFINetwork : WIFIScanResult? = wifiDevicesToSync.find {
-                it.BSSID == item.BSSID
+            val foundWIFINetwork : com.karpicki.locationscanner.WIFIScanResult? = wifiDevicesToSync.find {
+                it.scanResult.BSSID == item.scanResult.BSSID
             }
             if (foundWIFINetwork == null) {
                 wifiDevicesToSync.add(item)
@@ -112,9 +112,16 @@ class SyncService: Service() {
                         }
                         "wifi_scan_update" -> {
                             val wifiList = intent.extras?.get("wifi_results") as ArrayList<*>
-                            val foundWifNetworks: ArrayList<WIFIScanResult> = ArrayList()
+                            val foundWifNetworks: ArrayList<com.karpicki.locationscanner.WIFIScanResult> = ArrayList()
 
-                            wifiList.forEach { wifiNetwork -> foundWifNetworks.add(wifiNetwork as WIFIScanResult) }
+                            wifiList.forEach { wifiNetwork ->
+                                foundWifNetworks.add(com.karpicki.locationscanner.WIFIScanResult(
+                                    wifiNetwork as WIFIScanResult,
+                                    System.currentTimeMillis(),
+                                    wifiNetwork.level,
+                                    lastLocation
+                                ))
+                            }
 
                             collectWIFINetworks(foundWifNetworks)
 

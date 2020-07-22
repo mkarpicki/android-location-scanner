@@ -32,25 +32,41 @@ class WIFIStoreTask: AsyncTask<String, Int, Int>() {
         return response.code()
     }
 
-    public fun stringify(location : Location, list: ArrayList<ScanResult>): String {
-        var strNetworks = ""
+    fun stringify(location : Location, list: ArrayList<WIFIScanResult>): String {
+
         val strLocation = "\"location\": {\"latitude\": ${location.latitude}, \"longitude\": ${location.longitude}}"
+        val devicesArray = java.util.ArrayList<String>()
 
         list.forEachIndexed{ index, item ->
-            val ssid = item.SSID
-            val bssid = item.BSSID
-            val rssi = item.level
-            var strItem = ""
+            val ssid = item.scanResult.SSID
+            val bssid = item.scanResult.BSSID
+            val rssi = item.scanResult.level
+            val deviceLocation: Location? = item.location
+            val timestamp = item.timestamp
 
-            strItem = " {\"network\": {\"ssid\": \"$ssid\", \"bssid\": \"$bssid\" }, \"rssi\": $rssi}"
+            val itemArray = java.util.ArrayList<String>()
 
-            if (index > 0) {
-                strItem = ",$strItem"
+            itemArray.add("\"rssi\": $rssi")
+
+            if (deviceLocation != null) {
+                itemArray.add("\"location\": {\"latitude\": ${deviceLocation.latitude}, \"longitude\": ${deviceLocation.longitude}}")
             }
-            strNetworks += strItem
-        }
-        strNetworks = "\"networks\": [$strNetworks]"
+            if (timestamp != 0L) {
+                itemArray.add("\"timestamp\": $timestamp")
+            }
 
-        return "{$strLocation, $strNetworks}"
+            var itemStr = itemArray.joinToString(",")
+
+            val deviceStr = "\"network\": {\"ssid\": \"$ssid\", \"bssid\": \"$bssid\" }"
+
+            itemStr = "{ $itemStr, $deviceStr }"
+
+            devicesArray.add(itemStr)
+
+        }
+
+        val devicesStr = devicesArray.joinToString(",")
+
+        return "{$strLocation, \"networks\": [$devicesStr] }"
     }
 }
