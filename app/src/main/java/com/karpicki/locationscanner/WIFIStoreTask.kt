@@ -20,9 +20,9 @@ class WIFIStoreTask: AsyncTask<String, Int, Int>() {
         val body: RequestBody = RequestBody.create(mediaType, json)
 
         val request: Request = Request.Builder()
-            .url(BuildConfig.BT_STORE_HOST)
+            .url(BuildConfig.WIFI_STORE_HOST)
             .post(body)
-            .header("x-api-key", BuildConfig.BT_STORE_API_KEY )
+            .header("x-api-key", BuildConfig.WIFI_STORE_API_KEY )
             .build()
 
         val response: Response = client.newCall(request).execute()

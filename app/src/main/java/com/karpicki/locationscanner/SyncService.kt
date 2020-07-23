@@ -32,7 +32,7 @@ class SyncService: Service() {
         val responseCode = btStoreTask.execute(json)
 
         Log.d("syncBTDevices:payload", json)
-        Log.d("syncBTDevices:response_code", responseCode.toString())
+        //Log.d("syncBTDevices:response_code", responseCode.toString())
 
         bTDevicesToSync.clear()
     }
@@ -40,7 +40,7 @@ class SyncService: Service() {
     private fun syncWIFINetworks(location : Location) {
         val wifiStoreTask = WIFIStoreTask()
         val json = wifiStoreTask.stringify(location, wifiDevicesToSync)
-        //val responseCode = wifiStoreTask.execute(json)
+        val responseCode = wifiStoreTask.execute(json)
 
         Log.d("syncWIFINetworks:payload", json)
         //Log.d("syncWIFINetworks:response_code", responseCode.toString())
