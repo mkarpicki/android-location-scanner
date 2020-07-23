@@ -25,23 +25,14 @@ class SyncService: Service() {
     private var wifiDevicesToSync: ArrayList<com.karpicki.locationscanner.WIFIScanResult> = ArrayList()
     private var bTDevicesToSync: ArrayList<BLuetoothScanResult> = ArrayList()
 
-//    private fun getNames (): String {
-//        var  str = ""
-//
-//        bTDevicesToSync.forEach { item ->
-//            str += item.device.address + ", "
-//        }
-//
-//        return str
-//    }
-
     private fun syncBTDevices(location : Location) {
 
         val btStoreTask = BTStoreTask()
         val json = btStoreTask.stringify(location, bTDevicesToSync)
-        //BTStoreTask().execute(json)
+        val responseCode = btStoreTask.execute(json)
 
-        Log.d("syncBTDevices", json)
+        Log.d("syncBTDevices:payload", json)
+        Log.d("syncBTDevices:response_code", responseCode.toString())
 
         bTDevicesToSync.clear()
     }
@@ -49,9 +40,10 @@ class SyncService: Service() {
     private fun syncWIFINetworks(location : Location) {
         val wifiStoreTask = WIFIStoreTask()
         val json = wifiStoreTask.stringify(location, wifiDevicesToSync)
-        //BTStoreTask().execute(json)
+        //val responseCode = wifiStoreTask.execute(json)
 
-        Log.d("syncWIFINetworks", json)
+        Log.d("syncWIFINetworks:payload", json)
+        //Log.d("syncWIFINetworks:response_code", responseCode.toString())
 
         wifiDevicesToSync.clear()
     }
