@@ -41,7 +41,7 @@ class GPSService : Service() {
         }
         // permissions enforced in Activity, so check can be skipped
         locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 3000L, 0f, locationListener)
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 3000L, 5.0F, locationListener)
         //TODO("pass both minValues from UI")
     }
 
