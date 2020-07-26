@@ -25,27 +25,39 @@ class SyncService: Service() {
     private var wifiDevicesToSync: ArrayList<com.karpicki.locationscanner.WIFIScanResult> = ArrayList()
     private var bTDevicesToSync: ArrayList<BLuetoothScanResult> = ArrayList()
 
+    private fun broadcastSaveStatus(action: String, value: Int) {
+        val scanIntent = Intent(action)
+        scanIntent.putExtra("status", value)
+        sendBroadcast(scanIntent)
+    }
+
     private fun syncBTDevices(location : Location) {
 
         val btStoreTask = BTStoreTask()
         val json = btStoreTask.stringify(location, bTDevicesToSync)
-        val responseCode = btStoreTask.execute(json)
+        val responseCode = btStoreTask.execute(json).get()
 
         Log.d("syncBTDevices:payload", json)
-        //Log.d("syncBTDevices:response_code", responseCode.toString())
+        Log.d("syncBTDevices:response_code", responseCode.toString())
 
-        bTDevicesToSync.clear()
+        if (responseCode == 201) {
+            bTDevicesToSync.clear()
+        }
+        broadcastSaveStatus("bt_save_status", responseCode)
     }
 
     private fun syncWIFINetworks(location : Location) {
         val wifiStoreTask = WIFIStoreTask()
         val json = wifiStoreTask.stringify(location, wifiDevicesToSync)
-        val responseCode = wifiStoreTask.execute(json)
+        val responseCode = wifiStoreTask.execute(json).get()
 
         Log.d("syncWIFINetworks:payload", json)
-        //Log.d("syncWIFINetworks:response_code", responseCode.toString())
+        Log.d("syncWIFINetworks:response_code", responseCode.toString())
 
-        wifiDevicesToSync.clear()
+        if (responseCode == 201) {
+            wifiDevicesToSync.clear()
+        }
+        broadcastSaveStatus("wifi_save_status", responseCode)
     }
 
     private fun collectWIFINetworks(list: ArrayList<com.karpicki.locationscanner.WIFIScanResult>) {

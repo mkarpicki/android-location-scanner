@@ -19,6 +19,12 @@ class MainActivity : AppCompatActivity() {
 
     private val requestCode: Int = 100
 
+    private var wifiSaveSuccessCount = 0;
+    private var wifiSaveFailureCount = 0;
+
+    private var btSaveSuccessCount = 0;
+    private var btSaveFailureCount = 0;
+
     private lateinit var binding: ActivityMainBinding
     private var broadcastReceiver: BroadcastReceiver? = null
 
@@ -44,6 +50,22 @@ class MainActivity : AppCompatActivity() {
                 override fun onReceive(p0: Context?, intent: Intent?) {
 
                     when (intent?.action) {
+                        "wifi_save_status" -> {
+                            val status = intent.extras?.get("status") as Int
+                            if (status == 201) {
+                                wifiSaveSuccessCount++;
+                            } else {
+                                wifiSaveFailureCount++;
+                            }
+                        }
+                        "bt_save_status" -> {
+                            val status = intent.extras?.get("status") as Int
+                            if (status == 201) {
+                                btSaveSuccessCount++;
+                            } else {
+                                btSaveFailureCount++;
+                            }
+                        }
                         "location_update" -> {
                             val location = intent.extras?.get("location") as Location
                             lastLocation = location
