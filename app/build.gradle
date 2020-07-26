@@ -26,6 +26,18 @@ def getWIFIStoreHost() {
     return properties.getProperty("wifi.storage.host")
 }
 
+def getIgnoredListApiKey() {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    return properties.getProperty("ignored-list.apiKey")
+}
+
+def getIgnoredListHost() {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    return properties.getProperty("ignored-list.host")
+}
+
 android {
     compileSdkVersion 29
 
@@ -48,6 +60,8 @@ android {
             buildConfigField("String", "BT_STORE_HOST", "\""+getBTStoreHost()+"\"")
             buildConfigField("String", "WIFI_STORE_API_KEY", "\""+getWIFIStoreApiKey()+"\"")
             buildConfigField("String", "WIFI_STORE_HOST", "\""+getWIFIStoreHost()+"\"")
+            buildConfigField("String", "IGNORED_LIST_API_KEY", "\""+getIgnoredListApiKey()+"\"")
+            buildConfigField("String", "IGNORED_LIST_HOST", "\""+getIgnoredListHost()+"\"")
         }
 
         release {
@@ -57,6 +71,8 @@ android {
             buildConfigField("String", "BT_STORE_HOST", "\""+getBTStoreHost()+"\"")
             buildConfigField("String", "WIFI_STORE_API_KEY", "\""+getWIFIStoreApiKey()+"\"")
             buildConfigField("String", "WIFI_STORE_HOST", "\""+getWIFIStoreHost()+"\"")
+            buildConfigField("String", "IGNORED_LIST_API_KEY", "\""+getIgnoredListApiKey()+"\"")
+            buildConfigField("String", "IGNORED_LIST_HOST", "\""+getIgnoredListHost()+"\"")
         }
     }
 

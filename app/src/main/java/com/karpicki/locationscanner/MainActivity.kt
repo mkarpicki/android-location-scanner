@@ -11,6 +11,7 @@ import android.net.wifi.ScanResult as WIFIScanResult
 import android.bluetooth.le.ScanResult as BTScanResult
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.karpicki.locationscanner.databinding.ActivityMainBinding
@@ -148,7 +149,20 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun updateListOfIgnoredDevices() {
+        val ignoredListLoaderTask = IgnoredListLoaderTask()
+        ignoredListLoaderTask.setContext(this)
+        val responseCode = ignoredListLoaderTask.execute().get()
+
+        if (responseCode != 200) {
+            Toast.makeText(this,R.string.ignored_list_not_loaded,Toast.LENGTH_LONG).show()
+        }
+    }
+
     private fun start() {
+
+        updateListOfIgnoredDevices()
+
         binding.mainButtonStart.setOnClickListener {
             val gpsIntent = Intent(applicationContext, GPSService::class.java)
             startService(gpsIntent)

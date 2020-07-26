@@ -6,4 +6,7 @@
     <string name="location_hint">Searching for GPS Location…</string>
     <string name="found_wifi_networks_hint">Searching for WIFI Networks…</string>
     <string name="found_bt_devices_hint">Searching for BT Devices…</string>
+
+    <string name="ignored_list_not_loaded">
+        There was a problem with requesting ignored list. Previous one will be used</string>
 </resources>
