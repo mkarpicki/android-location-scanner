@@ -44,58 +44,15 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
+        prepareReceiver()
+    }
+
+    private fun prepareReceiver() {
         if (broadcastReceiver == null) {
             broadcastReceiver = object : BroadcastReceiver() {
 
                 override fun onReceive(p0: Context?, intent: Intent?) {
-
-                    when (intent?.action) {
-                        "wifi_save_status" -> {
-                            val status = intent.extras?.get("status") as Int
-                            if (status == 201) {
-                                wifiSaveSuccessCount++;
-                            } else {
-                                wifiSaveFailureCount++;
-                            }
-                        }
-                        "bt_save_status" -> {
-                            val status = intent.extras?.get("status") as Int
-                            if (status == 201) {
-                                btSaveSuccessCount++;
-                            } else {
-                                btSaveFailureCount++;
-                            }
-                        }
-                        "location_update" -> {
-                            val location = intent.extras?.get("location") as Location
-                            lastLocation = location
-                            displayLocation(lastLocation as Location)
-                        }
-                        "wifi_scan_update" -> {
-                            lastWifiList.clear()
-                            val wifiList = intent.extras?.get("wifi_results") as ArrayList<*>
-                            wifiList.forEach { wifiNetwork -> lastWifiList.add(wifiNetwork as WIFIScanResult) }
-                            displayWIFINetworks(lastWifiList)
-                        }
-                        "bt_scan_update" -> {
-                            val btList = intent.extras?.get("bt_results") as ArrayList<*>
-
-                            if (lastBTDevices.size > 10) {
-                                lastBTDevices.clear()
-                            }
-
-                            btList.forEach { btDevice ->
-                                val item = btDevice as BTScanResult
-                                val foundBtDevice: BTScanResult? = lastBTDevices.find {
-                                    it.device.address == item.device.address
-                                }
-                                if (foundBtDevice == null) {
-                                    lastBTDevices.add(btDevice)
-                                }
-                            }
-                            displayBTDevices(lastBTDevices)
-                        }
-                    }
+                    handleIntents(intent)
                 }
             }
 
@@ -103,13 +60,69 @@ class MainActivity : AppCompatActivity() {
             intentFilter.addAction("location_update")
             intentFilter.addAction("wifi_scan_update")
             intentFilter.addAction("bt_scan_update")
+            intentFilter.addAction("wifi_save_status")
+            intentFilter.addAction("bt_save_status")
 
             registerReceiver(broadcastReceiver, intentFilter)
         }
     }
 
+    private fun handleIntents(intent: Intent?) {
+        when (intent?.action) {
+            "wifi_save_status" -> {
+                val status = intent.extras?.get("status") as Int
+                if (status == 201) {
+                    wifiSaveSuccessCount++;
+                } else {
+                    wifiSaveFailureCount++;
+                }
+            }
+            "bt_save_status" -> {
+                val status = intent.extras?.get("status") as Int
+                if (status == 201) {
+                    btSaveSuccessCount++;
+                } else {
+                    btSaveFailureCount++;
+                }
+            }
+            "location_update" -> {
+                val location = intent.extras?.get("location") as Location
+                lastLocation = location
+                displayLocation(lastLocation as Location)
+            }
+            "wifi_scan_update" -> {
+                lastWifiList.clear()
+                val wifiList = intent.extras?.get("wifi_results") as ArrayList<*>
+                wifiList.forEach { wifiNetwork -> lastWifiList.add(wifiNetwork as WIFIScanResult) }
+                displayWIFINetworks(lastWifiList)
+            }
+            "bt_scan_update" -> {
+                val btList = intent.extras?.get("bt_results") as ArrayList<*>
+
+                if (lastBTDevices.size > 10) {
+                    lastBTDevices.clear()
+                }
+
+                btList.forEach { btDevice ->
+                    val item = btDevice as BTScanResult
+                    val foundBtDevice: BTScanResult? = lastBTDevices.find {
+                        it.device.address == item.device.address
+                    }
+                    if (foundBtDevice == null) {
+                        lastBTDevices.add(btDevice)
+                    }
+                }
+                displayBTDevices(lastBTDevices)
+            }
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
+        releaseReceiver()
+    }
+
+    private fun releaseReceiver() {
         if (broadcastReceiver != null) {
             unregisterReceiver(broadcastReceiver)
         }
