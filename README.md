@@ -26,7 +26,6 @@ When position changed send collected BT devices and WIFI networks to REST APIs.
 Modify or create local.properties file and add variables.
 
 Pair of variables used for REST API where app will POST found BT devices.   
-
 `bt.storage.apiKey=...` - value for x-api-key Header sent with request  
 `bt.storage.host=...` - REST API endpoint which will expose POST method to consume devices  
 
@@ -34,6 +33,32 @@ Pair of variables used for REST API where app will POST found WIFI networks.
 `wifi.storage.apiKey=...` - value for x-api-key Header sent with request  
 `wifi.storage.host=...` - REST API endpoint which will expose POST method to consume networks  
 
+Pair of variables used for REST API which app can fetch list of devices to ignore when scanning  
+`ignored-list.apiKey=...` - value for x-api-key Header sent with request  
+`ignored-list.host=...` - REST API endpoint which will expose GET method to read list  
+
+Expected `ignored-list` response:
+```json
+{
+    "wifi": [
+        {
+            "bssid": "xx:xx:xx:xx:xx:xx"
+        },
+        {
+            "bssid": "..."
+        }
+    ],
+    "bt": [
+        {
+            "address": "xx:xx:xx:xx:xx:xx"
+        },
+        {
+            "address": "..."
+        }
+    ]
+}
+```
+> This config is optional. If not provided app will not use ifnored list.  
 
 ### External requirement(s)
 Create own REST API which will expose defined endpoints and consume data
