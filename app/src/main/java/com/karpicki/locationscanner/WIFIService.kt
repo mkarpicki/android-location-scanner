@@ -16,6 +16,8 @@ class WIFIService : Service() {
     private var resultList = ArrayList<ScanResult>()
     private lateinit var wifiManager: WifiManager
 
+    private var addressesToIgnore: ArrayList<String> = ArrayList<String>()
+
     private lateinit var broadcastReceiver: BroadcastReceiver
 
     override fun onBind(p0: Intent?): IBinder? {
@@ -47,7 +49,6 @@ class WIFIService : Service() {
         if (!wifiManager.startScan()) {
             TODO("consider handling failure")
         }
-
     }
 
     override fun onDestroy() {

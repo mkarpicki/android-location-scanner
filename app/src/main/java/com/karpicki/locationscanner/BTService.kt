@@ -14,6 +14,9 @@ class BTService: Service() {
 
     private lateinit var bluetoothLeScanner: BluetoothLeScanner
     private var bluetoothAdapter: BluetoothAdapter? = null
+    
+    private var addressesToIgnore: ArrayList<String> = ArrayList<String>()
+
 
 //    private val bluetoothLeScanner: BluetoothLeScanner
 //        get() {

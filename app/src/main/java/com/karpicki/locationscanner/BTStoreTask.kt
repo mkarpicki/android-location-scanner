@@ -32,7 +32,7 @@ class BTStoreTask : AsyncTask<String, Int, Int>() {
         return response.code()
     }
 
-    fun stringify(location: Location, list: ArrayList<BLuetoothScanResult>): String {
+    fun stringify(location: Location, list: ArrayList<BTScanResult>): String {
 
         val strLocation = "\"location\": {\"latitude\": ${location.latitude}, \"longitude\": ${location.longitude}}"
         val devicesArray = ArrayList<String>()

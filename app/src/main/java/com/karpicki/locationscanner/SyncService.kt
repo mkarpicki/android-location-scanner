@@ -23,7 +23,7 @@ class SyncService: Service() {
     private var lastLocation: Location? = null
 
     private var wifiDevicesToSync: ArrayList<com.karpicki.locationscanner.WIFIScanResult> = ArrayList()
-    private var bTDevicesToSync: ArrayList<BLuetoothScanResult> = ArrayList()
+    private var bTDevicesToSync: ArrayList<com.karpicki.locationscanner.BTScanResult> = ArrayList()
 
     private fun broadcastSaveStatus(action: String, value: Int) {
         val scanIntent = Intent(action)
@@ -71,9 +71,9 @@ class SyncService: Service() {
         }
     }
 
-    private fun collectBTDevices (list : ArrayList<BLuetoothScanResult>) {
+    private fun collectBTDevices (list : ArrayList<com.karpicki.locationscanner.BTScanResult>) {
         list.forEach { item ->
-            val foundBtDevice: BLuetoothScanResult? = bTDevicesToSync.find {
+            val foundBtDevice: com.karpicki.locationscanner.BTScanResult? = bTDevicesToSync.find {
                 it.scanResult.device.address == item.scanResult.device.address
             }
             if (foundBtDevice == null) {
@@ -136,16 +136,18 @@ class SyncService: Service() {
                         "bt_scan_update" -> {
                             val btList = intent.extras?.get("bt_results") as ArrayList<*>
 
-                            val bluetoothScanResults = ArrayList<BLuetoothScanResult>()
+                            val bluetoothScanResults = ArrayList<com.karpicki.locationscanner.BTScanResult>()
 
                             btList.forEach { btDevice ->
                                 //foundBTDevices.add(btDevice as BTScanResult)
-                                bluetoothScanResults.add(BLuetoothScanResult(
-                                    btDevice as BTScanResult,
-                                    System.currentTimeMillis(),
-                                    btDevice.rssi,
-                                    lastLocation
-                                ))
+                                bluetoothScanResults.add(
+                                    BTScanResult(
+                                        btDevice as BTScanResult,
+                                        System.currentTimeMillis(),
+                                        btDevice.rssi,
+                                        lastLocation
+                                    )
+                                )
 
                             }
 

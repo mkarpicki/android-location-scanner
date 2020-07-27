@@ -11,7 +11,6 @@ import android.net.wifi.ScanResult as WIFIScanResult
 import android.bluetooth.le.ScanResult as BTScanResult
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import com.karpicki.locationscanner.databinding.ActivityMainBinding
@@ -32,6 +31,9 @@ class MainActivity : AppCompatActivity() {
     private var lastLocation: Location? = null
     private var lastWifiList: ArrayList<WIFIScanResult> = ArrayList()
     private var lastBTDevices: ArrayList<BTScanResult> = ArrayList()
+
+    private var listOfIgnoredWIFIAddresses: ArrayList<String> = ArrayList()
+    private var listOfIgnoredBTAdresses: ArrayList<String> = ArrayList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -150,13 +152,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun updateListOfIgnoredDevices() {
+
         val ignoredListLoaderTask = IgnoredListLoaderTask()
         ignoredListLoaderTask.setContext(this)
-        val responseCode = ignoredListLoaderTask.execute().get()
+        val responseStr = ignoredListLoaderTask.execute().get()
 
-        if (responseCode != 200) {
-            Toast.makeText(this,R.string.ignored_list_not_loaded,Toast.LENGTH_LONG).show()
-        }
+        this.listOfIgnoredBTAdresses = ignoredListLoaderTask.parseBTList(responseStr)
+        this.listOfIgnoredWIFIAddresses = ignoredListLoaderTask.parseWIFIList(responseStr)
+
+        //Toast.makeText(this,R.string.ignored_list_not_loaded,Toast.LENGTH_LONG).show()
     }
 
     private fun start() {
@@ -168,9 +172,11 @@ class MainActivity : AppCompatActivity() {
             startService(gpsIntent)
 
             val wifiIntent = Intent(applicationContext, WIFIService::class.java)
+            wifiIntent.putExtra("addressesToIgnore", listOfIgnoredWIFIAddresses)
             startService(wifiIntent)
 
             val btIntent = Intent(applicationContext, BTService::class.java)
+            btIntent.putExtra("addressesToIgnore", this.listOfIgnoredBTAdresses)
             startService(btIntent)
 
             val syncIntent = Intent(applicationContext, SyncService::class.java)
