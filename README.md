@@ -39,24 +39,12 @@ Pair of variables used for REST API which app can fetch list of devices to ignor
 
 Expected `ignored-list` response:
 ```json
-{
-    "wifi": [
-        {
-            "bssid": "xx:xx:xx:xx:xx:xx"
-        },
-        {
-            "bssid": "..."
-        }
-    ],
-    "bt": [
-        {
-            "address": "xx:xx:xx:xx:xx:xx"
-        },
-        {
-            "address": "..."
-        }
-    ]
-}
+[
+  "xx:xx:xx:xx:xx:xx",
+  "yy:yy:yy:yy:yy:yy",
+  "..."
+]
+
 ```
 > This config is optional. If not provided app will not use ifnored list.  
 

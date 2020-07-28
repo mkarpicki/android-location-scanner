@@ -28,12 +28,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private var broadcastReceiver: BroadcastReceiver? = null
 
-    private var lastLocation: Location? = null
-    private var lastWifiList: ArrayList<WIFIScanResult> = ArrayList()
-    private var lastBTDevices: ArrayList<BTScanResult> = ArrayList()
+    private var lastLocation: Location? = null;
+    private var lastWifiList: ArrayList<WIFIScanResult> = ArrayList();
+    private var lastBTDevices: ArrayList<BTScanResult> = ArrayList();
 
-    private var listOfIgnoredWIFIAddresses: ArrayList<String> = ArrayList()
-    private var listOfIgnoredBTAdresses: ArrayList<String> = ArrayList()
+    private lateinit var listOfIgnoredAddresses: Array<String>;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -157,8 +156,7 @@ class MainActivity : AppCompatActivity() {
         ignoredListLoaderTask.setContext(this)
         val responseStr = ignoredListLoaderTask.execute().get()
 
-        this.listOfIgnoredBTAdresses = ignoredListLoaderTask.parseBTList(responseStr)
-        this.listOfIgnoredWIFIAddresses = ignoredListLoaderTask.parseWIFIList(responseStr)
+        this.listOfIgnoredAddresses = ignoredListLoaderTask.parse(responseStr)
 
         //Toast.makeText(this,R.string.ignored_list_not_loaded,Toast.LENGTH_LONG).show()
     }
@@ -172,11 +170,11 @@ class MainActivity : AppCompatActivity() {
             startService(gpsIntent)
 
             val wifiIntent = Intent(applicationContext, WIFIService::class.java)
-            wifiIntent.putExtra("addressesToIgnore", listOfIgnoredWIFIAddresses)
+            wifiIntent.putExtra("addressesToIgnore", listOfIgnoredAddresses)
             startService(wifiIntent)
 
             val btIntent = Intent(applicationContext, BTService::class.java)
-            btIntent.putExtra("addressesToIgnore", this.listOfIgnoredBTAdresses)
+            btIntent.putExtra("addressesToIgnore", this.listOfIgnoredAddresses)
             startService(btIntent)
 
             val syncIntent = Intent(applicationContext, SyncService::class.java)

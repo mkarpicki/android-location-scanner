@@ -15,8 +15,7 @@ class BTService: Service() {
     private lateinit var bluetoothLeScanner: BluetoothLeScanner
     private var bluetoothAdapter: BluetoothAdapter? = null
     
-    private var addressesToIgnore: ArrayList<String> = ArrayList<String>()
-
+    private var addressesToIgnore: ArrayList<String> = ArrayList()
 
 //    private val bluetoothLeScanner: BluetoothLeScanner
 //        get() {
@@ -25,17 +24,30 @@ class BTService: Service() {
 //            return bluetoothAdapter.bluetoothLeScanner
 //        }
 
+    private fun ignoreResult(result: ScanResult?): Boolean {
+        var ignore = false
+        this.addressesToIgnore.forEach {
+            if (it == result?.device?.address) {
+                ignore = true;
+                return ignore;
+            }
+        }
+        return ignore;
+    }
+
     private val bleScanner = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult?) {
             super.onScanResult(callbackType, result)
             //val str = "onScanResult: ${result?.device?.address} - ${result?.device?.name}"
 
-            val resultList = ArrayList<ScanResult>()
-            resultList.add(result as ScanResult)
+            if (!ignoreResult(result)) {
+                val resultList = ArrayList<ScanResult>()
+                resultList.add(result as ScanResult)
 
-            val scanIntent = Intent("bt_scan_update")
-            scanIntent.putExtra("bt_results", resultList)
-            sendBroadcast(scanIntent)
+                val scanIntent = Intent("bt_scan_update")
+                scanIntent.putExtra("bt_results", resultList)
+                sendBroadcast(scanIntent)
+            }
         }
 
         override fun onBatchScanResults(results: MutableList<ScanResult>?) {
@@ -47,6 +59,16 @@ class BTService: Service() {
 
     override fun onBind(p0: Intent?): IBinder? {
         TODO("Not yet implemented")
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent != null) {
+            val intentAddressesToIgnore = intent.extras?.get("addressesToIgnore") as Array<*>
+            intentAddressesToIgnore.forEach {
+                addressesToIgnore.add(it.toString())
+            }
+        }
+        return START_STICKY;
     }
 
     override fun onCreate() {

@@ -16,12 +16,22 @@ class WIFIService : Service() {
     private var resultList = ArrayList<ScanResult>()
     private lateinit var wifiManager: WifiManager
 
-    private var addressesToIgnore: ArrayList<String> = ArrayList<String>()
+    private var addressesToIgnore: ArrayList<String> = ArrayList()
 
     private lateinit var broadcastReceiver: BroadcastReceiver
 
     override fun onBind(p0: Intent?): IBinder? {
         TODO("Not yet implemented")
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        if (intent != null) {
+            val intentAddressesToIgnore = intent.extras?.get("addressesToIgnore") as Array<*>
+            intentAddressesToIgnore.forEach {
+                addressesToIgnore.add(it.toString())
+            }
+        }
+        return START_STICKY;
     }
 
     override fun onCreate() {

@@ -56,35 +56,20 @@ class IgnoredListLoaderTask: AsyncTask<Void, Void, String>() {
         return responseStr;
     }
 
-    fun parseWIFIList(strJson: String?): ArrayList<String> {
-        val listJson: JSONArray = parse(strJson, "wifi")
-        val list = ArrayList<String>()
-        for (i in 0 until listJson.length()) {
-            val address: String = listJson.getJSONObject(i).get("bssid").toString()
-            list.add(address)
-        }
-        return list;
-    }
+    fun parse(strJson: String?): Array<String> {
 
-    fun parseBTList(strJson: String?): ArrayList<String> {
-        val listJson: JSONArray = parse(strJson, "bt")
-        val list = ArrayList<String>()
-        for (i in 0 until listJson.length()) {
-            val address: String = listJson.getJSONObject(i).get("address").toString()
-            list.add(address)
-        }
-        return list;
-    }
-
-    private fun parse(strJson: String?, propName: String): JSONArray {
+        var jsonArray = JSONArray()
 
         if (strJson != null) {
             try {
-                return JSONObject(strJson).get(propName) as JSONArray
+                jsonArray = JSONArray(strJson)
             } catch (e: JSONException) {
             }
         }
-        return JSONArray()
+
+        return Array(jsonArray.length()) {
+            jsonArray.getString(it)
+        }
     }
 
     private fun saveList(response: String) {
