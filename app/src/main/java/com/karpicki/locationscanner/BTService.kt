@@ -17,22 +17,9 @@ class BTService: Service() {
     
     private var addressesToIgnore: ArrayList<String> = ArrayList()
 
-//    private val bluetoothLeScanner: BluetoothLeScanner
-//        get() {
-//            val bluetoothManager = applicationContext.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-//            val bluetoothAdapter = bluetoothManager.adapter
-//            return bluetoothAdapter.bluetoothLeScanner
-//        }
-
     private fun ignoreResult(result: ScanResult?): Boolean {
-        var ignore = false
-        this.addressesToIgnore.forEach {
-            if (it == result?.device?.address) {
-                ignore = true;
-                return ignore;
-            }
-        }
-        return ignore;
+
+        return !(this.addressesToIgnore.find { item -> item.equals(result?.device?.address, true) }).isNullOrEmpty()
     }
 
     private val bleScanner = object : ScanCallback() {

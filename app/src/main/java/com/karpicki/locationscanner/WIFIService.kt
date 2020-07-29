@@ -44,6 +44,7 @@ class WIFIService : Service() {
                 if (success!!) {
                     resultList = wifiManager.scanResults as ArrayList<ScanResult>
                     resultList = filterOutMyNetwork(resultList)
+                    resultList = filterOutIgnored(resultList)
                 } else {
                     resultList.clear()
                 }
@@ -66,18 +67,23 @@ class WIFIService : Service() {
         unregisterReceiver(broadcastReceiver)
     }
 
+    private fun ignoreResult(result: ScanResult): Boolean {
+        return !(this.addressesToIgnore.find { ignored -> ignored.equals(result.BSSID, true) }).isNullOrEmpty()
+    }
+
+    private fun filterOutIgnored(list: ArrayList<ScanResult>): ArrayList<ScanResult> {
+        return list.filter { item -> !(ignoreResult(item)) } as ArrayList<ScanResult>
+    }
+
+    // @todo move this to onCommandStart to extend ignoredlist by my MAc
     private fun filterOutMyNetwork(list: ArrayList<ScanResult>):ArrayList<ScanResult> {
 
         val wifiInfo = wifiManager.connectionInfo as WifiInfo
 
         return if (wifiInfo.supplicantState == SupplicantState.COMPLETED) {
-            val filteredList = ArrayList<ScanResult>()
-            list.forEach { item ->
-                if (!wifiInfo.bssid.equals(item.BSSID, true)) {
-                    filteredList.add(item)
-                }
-            }
-            filteredList
+
+            list.filter { item -> !item.BSSID.equals(wifiInfo.bssid, true) } as ArrayList<ScanResult>
+
         } else {
             list
         }
