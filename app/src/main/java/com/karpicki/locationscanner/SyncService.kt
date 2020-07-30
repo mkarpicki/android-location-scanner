@@ -17,8 +17,8 @@ class SyncService: Service() {
 
     private var broadcastReceiver: BroadcastReceiver? = null
 
-    private val btMaxBufforSize: Int = 50
-    private val wifiMaxBufforSize: Int = 25
+    private val btMaxBufforSize: Int = 20
+    private val wifiMaxBufforSize: Int = 10
 
     private var lastLocation: Location? = null
 
@@ -28,6 +28,18 @@ class SyncService: Service() {
     private fun broadcastSaveStatus(action: String, value: Int) {
         val scanIntent = Intent(action)
         scanIntent.putExtra("status", value)
+        sendBroadcast(scanIntent)
+    }
+
+    private fun broadcastWIFIList() {
+        val scanIntent = Intent("wifi_list_to_sync")
+        scanIntent.putExtra("list", wifiDevicesToSync)
+        sendBroadcast(scanIntent)
+    }
+
+    private fun broadcastBTList() {
+        val scanIntent = Intent("bt_list_to_sync")
+        scanIntent.putExtra("list", bTDevicesToSync)
         sendBroadcast(scanIntent)
     }
 
@@ -63,7 +75,7 @@ class SyncService: Service() {
     private fun collectWIFINetworks(list: ArrayList<com.karpicki.locationscanner.WIFIScanResult>) {
         list.forEach { item ->
             val foundWIFINetwork : com.karpicki.locationscanner.WIFIScanResult? = wifiDevicesToSync.find {
-                it.scanResult.BSSID == item.scanResult.BSSID
+                it.scanResult.BSSID .equals(item.scanResult.BSSID, true)
             }
             if (foundWIFINetwork == null) {
                 wifiDevicesToSync.add(item)
@@ -74,7 +86,7 @@ class SyncService: Service() {
     private fun collectBTDevices (list : ArrayList<com.karpicki.locationscanner.BTScanResult>) {
         list.forEach { item ->
             val foundBtDevice: com.karpicki.locationscanner.BTScanResult? = bTDevicesToSync.find {
-                it.scanResult.device.address == item.scanResult.device.address
+                it.scanResult.device.address.equals(item.scanResult.device.address, true)
             }
             if (foundBtDevice == null) {
                 bTDevicesToSync.add(item)
@@ -132,6 +144,7 @@ class SyncService: Service() {
                             if (collectedEnoughWIFINetworks()) {
                                 syncWIFINetworks(lastLocation!!)
                             }
+                            broadcastWIFIList()
                         }
                         "bt_scan_update" -> {
                             val btList = intent.extras?.get("bt_results") as ArrayList<*>
@@ -156,6 +169,7 @@ class SyncService: Service() {
                             if (collectedEnoughBTDevices()) {
                                 syncBTDevices(lastLocation!!)
                             }
+                            broadcastBTList()
                         }
                     }
                 }

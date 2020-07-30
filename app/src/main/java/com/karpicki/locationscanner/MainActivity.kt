@@ -29,8 +29,6 @@ class MainActivity : AppCompatActivity() {
     private var broadcastReceiver: BroadcastReceiver? = null
 
     private var lastLocation: Location? = null;
-    private var lastWifiList: ArrayList<WIFIScanResult> = ArrayList();
-    private var lastBTDevices: ArrayList<BTScanResult> = ArrayList();
 
     private lateinit var listOfIgnoredAddresses: Array<String>;
 
@@ -60,10 +58,12 @@ class MainActivity : AppCompatActivity() {
 
             val intentFilter = IntentFilter()
             intentFilter.addAction("location_update")
-            intentFilter.addAction("wifi_scan_update")
-            intentFilter.addAction("bt_scan_update")
+
             intentFilter.addAction("wifi_save_status")
             intentFilter.addAction("bt_save_status")
+
+            intentFilter.addAction("wifi_list_to_sync")
+            intentFilter.addAction("bt_list_to_sync")
 
             registerReceiver(broadcastReceiver, intentFilter)
         }
@@ -92,29 +92,23 @@ class MainActivity : AppCompatActivity() {
                 lastLocation = location
                 displayLocation(lastLocation as Location)
             }
-            "wifi_scan_update" -> {
-                lastWifiList.clear()
-                val wifiList = intent.extras?.get("wifi_results") as ArrayList<*>
-                wifiList.forEach { wifiNetwork -> lastWifiList.add(wifiNetwork as WIFIScanResult) }
-                displayWIFINetworks(lastWifiList)
+            "wifi_list_to_sync" -> {
+                val wifiList = intent.extras?.get("list") as ArrayList<*>
+                val list = ArrayList<android.net.wifi.ScanResult>()
+                wifiList.forEach {
+                    val result = it as com.karpicki.locationscanner.WIFIScanResult
+                    list.add(result.scanResult)
+                }
+                displayWIFINetworks(list)
             }
-            "bt_scan_update" -> {
-                val btList = intent.extras?.get("bt_results") as ArrayList<*>
-
-                if (lastBTDevices.size > 10) {
-                    lastBTDevices.clear()
+            "bt_list_to_sync" -> {
+                val btList = intent.extras?.get("list") as ArrayList<*>
+                val list = ArrayList<android.bluetooth.le.ScanResult>()
+                btList.forEach {
+                    val result = it as com.karpicki.locationscanner.BTScanResult
+                    list.add(result.scanResult)
                 }
-
-                btList.forEach { btDevice ->
-                    val item = btDevice as BTScanResult
-                    val foundBtDevice: BTScanResult? = lastBTDevices.find {
-                        it.device.address == item.device.address
-                    }
-                    if (foundBtDevice == null) {
-                        lastBTDevices.add(btDevice)
-                    }
-                }
-                displayBTDevices(lastBTDevices)
+                displayBTDevices(list)
             }
         }
     }

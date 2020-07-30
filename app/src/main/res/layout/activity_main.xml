@@ -45,7 +45,7 @@
             android:background="#040404"
             android:hint="@string/found_bt_devices_hint"
             android:scrollbars="vertical"
-            android:textColor="#4CAF50"
+            android:textColor="#2196F3"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
