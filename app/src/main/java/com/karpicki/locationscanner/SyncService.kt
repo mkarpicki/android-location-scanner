@@ -106,6 +106,9 @@ class SyncService: Service() {
     private fun syncAll(location: Location) {
         syncBTDevices(location)
         syncWIFINetworks(location)
+
+        broadcastBTList()
+        broadcastWIFIList()
     }
 
     override fun onBind(p0: Intent?): IBinder? {
@@ -131,12 +134,14 @@ class SyncService: Service() {
                             val foundWifNetworks: ArrayList<com.karpicki.locationscanner.WIFIScanResult> = ArrayList()
 
                             wifiList.forEach { wifiNetwork ->
-                                foundWifNetworks.add(com.karpicki.locationscanner.WIFIScanResult(
-                                    wifiNetwork as WIFIScanResult,
-                                    System.currentTimeMillis(),
-                                    wifiNetwork.level,
-                                    lastLocation
-                                ))
+                                foundWifNetworks.add(
+                                    WIFIScanResult(
+                                        wifiNetwork as WIFIScanResult,
+                                        System.currentTimeMillis(),
+                                        wifiNetwork.level,
+                                        lastLocation
+                                    )
+                                )
                             }
 
                             collectWIFINetworks(foundWifNetworks)
