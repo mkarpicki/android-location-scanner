@@ -13,7 +13,6 @@ import android.os.IBinder
 
 class WIFIService : Service() {
 
-    private var resultList = ArrayList<ScanResult>()
     private lateinit var wifiManager: WifiManager
 
     private var addressesToIgnore: ArrayList<String> = ArrayList()
@@ -39,14 +38,13 @@ class WIFIService : Service() {
 
         broadcastReceiver = object : BroadcastReceiver() {
             override fun onReceive(contxt: Context?, intent: Intent?) {
+
                 val success = intent?.getBooleanExtra(WifiManager.EXTRA_RESULTS_UPDATED, false)
+                var resultList = ArrayList<ScanResult>()
 
                 if (success!!) {
                     resultList = wifiManager.scanResults as ArrayList<ScanResult>
-                    resultList = filterOutMyNetwork(resultList)
                     resultList = filterOutIgnored(resultList)
-                } else {
-                    resultList.clear()
                 }
                 val scanIntent = Intent("wifi_scan_update")
                 scanIntent.putExtra("wifi_results", resultList)
@@ -68,6 +66,9 @@ class WIFIService : Service() {
     }
 
     private fun ignoreResult(result: ScanResult): Boolean {
+        if (result.BSSID.equals(getMyWiFiAddress(), true)) {
+            return true;
+        }
         return !(this.addressesToIgnore.find { ignored -> ignored.equals(result.BSSID, true) }).isNullOrEmpty()
     }
 
@@ -75,18 +76,13 @@ class WIFIService : Service() {
         return list.filter { item -> !(ignoreResult(item)) } as ArrayList<ScanResult>
     }
 
-    // @todo move this to onCommandStart to extend ignoredlist by my MAc
-    private fun filterOutMyNetwork(list: ArrayList<ScanResult>):ArrayList<ScanResult> {
-
+    private fun getMyWiFiAddress(): String?{
         val wifiInfo = wifiManager.connectionInfo as WifiInfo
 
         return if (wifiInfo.supplicantState == SupplicantState.COMPLETED) {
-
-            list.filter { item -> !item.BSSID.equals(wifiInfo.bssid, true) } as ArrayList<ScanResult>
-
+            wifiInfo.bssid
         } else {
-            list
+            null
         }
-
     }
 }
