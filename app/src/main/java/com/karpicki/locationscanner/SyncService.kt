@@ -17,8 +17,8 @@ class SyncService: Service() {
 
     private var broadcastReceiver: BroadcastReceiver? = null
 
-    private val btMaxBufforSize: Int = 20
-    private val wifiMaxBufforSize: Int = 10
+    private val btMaxBufforSize: Int = 50
+    private val wifiMaxBufforSize: Int = 50
 
     private var lastLocation: Location? = null
 
@@ -43,7 +43,11 @@ class SyncService: Service() {
         sendBroadcast(scanIntent)
     }
 
-    private fun syncBTDevices(location : Location) {
+    private fun syncBTDevices(location : Location?) {
+
+        if (location == null) {
+            return
+        }
 
         val btStoreTask = BTStoreTask()
         val json = btStoreTask.stringify(location, bTDevicesToSync)
@@ -58,7 +62,12 @@ class SyncService: Service() {
         broadcastSaveStatus("bt_save_status", responseCode)
     }
 
-    private fun syncWIFINetworks(location : Location) {
+    private fun syncWIFINetworks(location : Location?) {
+
+        if (location == null) {
+            return
+        }
+
         val wifiStoreTask = WIFIStoreTask()
         val json = wifiStoreTask.stringify(location, wifiDevicesToSync)
         val responseCode = wifiStoreTask.execute(json).get()
@@ -103,7 +112,7 @@ class SyncService: Service() {
         return (bTDevicesToSync.size >= btMaxBufforSize && lastLocation != null)
     }
 
-    private fun syncAll(location: Location) {
+    private fun syncAll(location: Location?) {
         syncBTDevices(location)
         syncWIFINetworks(location)
 
@@ -127,7 +136,7 @@ class SyncService: Service() {
                         "location_update" -> {
                             val location = intent.extras?.get("location") as Location
                             lastLocation = location
-                            syncAll(location)
+                            //syncAll(location)
                         }
                         "wifi_scan_update" -> {
                             val wifiList = intent.extras?.get("wifi_results") as ArrayList<*>
@@ -147,7 +156,7 @@ class SyncService: Service() {
                             collectWIFINetworks(foundWifNetworks)
 
                             if (collectedEnoughWIFINetworks()) {
-                                syncWIFINetworks(lastLocation!!)
+                                syncWIFINetworks(lastLocation)
                             }
                             broadcastWIFIList()
                         }
@@ -172,7 +181,7 @@ class SyncService: Service() {
                             collectBTDevices(bluetoothScanResults)
 
                             if (collectedEnoughBTDevices()) {
-                                syncBTDevices(lastLocation!!)
+                                syncBTDevices(lastLocation)
                             }
                             broadcastBTList()
                         }
@@ -194,6 +203,7 @@ class SyncService: Service() {
         if (broadcastReceiver != null) {
             unregisterReceiver(broadcastReceiver)
         }
+        syncAll(lastLocation)
     }
 
 }
