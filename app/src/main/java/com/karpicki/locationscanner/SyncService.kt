@@ -153,6 +153,9 @@ class SyncService: Service() {
         }
         val featureCollection = FeatureCollection(features)
 
+        //https://medium.com/@gurpreetsk/getting-started-with-kotlin-serialization-3315c59bafb2
+        //https://github.com/Kotlin/kotlinx.serialization#setup
+        
 
         val str = Json(JsonConfiguration.Stable)
             .stringify(FeatureCollection.serializer(), featureCollection)
