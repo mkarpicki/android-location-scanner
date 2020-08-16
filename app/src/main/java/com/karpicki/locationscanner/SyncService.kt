@@ -10,6 +10,13 @@ import android.net.wifi.ScanResult as WIFIScanResult
 import android.bluetooth.le.ScanResult as BTScanResult
 import android.os.IBinder
 import android.util.Log
+import com.karpicki.locationscanner.geojson.BTProperties
+import com.karpicki.locationscanner.geojson.Feature
+import com.karpicki.locationscanner.geojson.FeatureCollection
+import com.karpicki.locationscanner.geojson.Geometry
+
+import kotlinx.serialization.*
+import kotlinx.serialization.json.*
 
 import kotlin.collections.ArrayList
 
@@ -124,6 +131,34 @@ class SyncService: Service() {
         TODO("Not yet implemented")
     }
 
+    private fun createGeoJson(items: ArrayList<com.karpicki.locationscanner.BTScanResult>) {
+        val features = ArrayList<Feature>()
+        items.forEach { item ->
+            val name = if (item.scanResult.device.name.isNotEmpty()) {
+                item.scanResult.device.name
+            } else {
+                item.scanResult.device.address
+            }
+            val properties = BTProperties(name, item.rssi, item.timestamp)
+            val coordinates = ArrayList<Double>()
+
+            if (item.location != null) {
+                coordinates.add(item.location.longitude)
+                coordinates.add(item.location.latitude)
+            }
+
+            val point = Geometry(coordinates)
+            val feature = Feature(properties, point)
+            features.add(feature)
+        }
+        val featureCollection = FeatureCollection(features)
+
+
+        val str = Json(JsonConfiguration.Stable)
+            .stringify(FeatureCollection.serializer(), featureCollection)
+
+    }
+
     override fun onCreate() {
         super.onCreate()
 
@@ -164,6 +199,8 @@ class SyncService: Service() {
                             val btList = intent.extras?.get("bt_results") as ArrayList<*>
 
                             val bluetoothScanResults = ArrayList<com.karpicki.locationscanner.BTScanResult>()
+
+                            createGeoJson(bluetoothScanResults)
 
                             btList.forEach { btDevice ->
                                 //foundBTDevices.add(btDevice as BTScanResult)
