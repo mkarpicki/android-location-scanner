@@ -4,6 +4,7 @@ import android.location.Location
 import android.os.AsyncTask
 import android.util.Log
 import okhttp3.*
+import java.lang.Exception
 
 class WIFIStoreTask: AsyncTask<String, Int, Int>() {
 
@@ -11,25 +12,36 @@ class WIFIStoreTask: AsyncTask<String, Int, Int>() {
 
     override fun doInBackground(vararg params: String?): Int? {
 
+        var responseCode: Int
+
         if (params.isEmpty()) {
             return null
         }
-        val json = params[0].toString()
-        val client = OkHttpClient();
-        val body: RequestBody = RequestBody.create(mediaType, json)
 
-        val request: Request = Request.Builder()
-            .url(BuildConfig.WIFI_STORE_HOST)
-            .post(body)
-            .header("x-api-key", BuildConfig.WIFI_STORE_API_KEY )
-            .build()
+        try {
+            val json = params[0].toString()
+            val client = OkHttpClient();
+            val body: RequestBody = RequestBody.create(mediaType, json)
 
-        val response: Response = client.newCall(request).execute()
+            val request: Request = Request.Builder()
+                .url(BuildConfig.WIFI_STORE_HOST)
+                .post(body)
+                .header("x-api-key", BuildConfig.WIFI_STORE_API_KEY )
+                .build()
 
-        Log.d("TAG", "response.code():" + response.code())
-        //response.body()?.string()
-        return response.code()
+            val response: Response = client.newCall(request).execute()
+
+            Log.d("TAG", "response.code():" + response.code())
+            //response.body()?.string()
+            responseCode = response.code()
+
+        } catch (e: Exception) {
+            responseCode = 500
+        }
+
+        return responseCode
     }
+
     fun stringifyGeoJson(location : Location, list: ArrayList<WIFIScanResult>): String {
 
         val features = ArrayList<String>()

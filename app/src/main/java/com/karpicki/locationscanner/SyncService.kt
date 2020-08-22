@@ -18,7 +18,9 @@ class SyncService: Service() {
     private var broadcastReceiver: BroadcastReceiver? = null
 
     private val btMaxBufforSize: Int = 50
-    private val wifiMaxBufforSize: Int = 25
+    private val wifiMaxBufforSize: Int = 15
+    private val numberOfLocationChangesToForceSync: Int = 3
+    private var numberOfLocationChanges: Int = 0
 
     private var lastLocation: Location? = null
 
@@ -124,6 +126,10 @@ class SyncService: Service() {
         broadcastWIFIList()
     }
 
+    private fun locationChangedEnough() : Boolean {
+        return numberOfLocationChanges % numberOfLocationChangesToForceSync == 0;
+    }
+
     override fun onBind(p0: Intent?): IBinder? {
         TODO("Not yet implemented")
     }
@@ -140,7 +146,13 @@ class SyncService: Service() {
                         "location_update" -> {
                             val location = intent.extras?.get("location") as Location
                             lastLocation = location
-                            //syncAll(location)
+
+                            numberOfLocationChanges++
+
+                            if (locationChangedEnough()) {
+                                syncAll(location)
+                            }
+
                         }
                         "wifi_scan_update" -> {
                             val wifiList = intent.extras?.get("wifi_results") as ArrayList<*>
