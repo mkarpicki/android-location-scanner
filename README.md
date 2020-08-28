@@ -49,58 +49,77 @@ Expected `ignored-list` response:
 > This config is optional. If not provided app will not use ifnored list.  
 
 ### External requirement(s)
-Create own REST API which will expose defined endpoints and consume data
+Create own REST API which will expose defined endpoints and consume GeoJSON data
 
 1. Bluetooth devices endpoint
 ```json
 {
-  "location": {
-    "latitude": 53.3486734, 
-    "longitude": 13.0112315
-  }, 
-  "devices": [{ 
-    "rssi": -71,
-    "location": {
-      "latitude": 53.3486713, 
-      "longitude": 13.011213
-    },
-    "timestamp": 1595456722064, 
-    "device": {
-      "address": "xx:xx:xx:xx:xx:xx",
-      "name": "some name" 
-    } 
-  }] 
+    "type": "FeatureCollection",
+    "features": [{
+        "geometry": {
+            "type": "Point",
+            "coordinates": [
+                15.109267,
+                53.4386779
+            ]
+        },
+        "properties": {
+            "name": "xx:xx:xx:xx:xx:xx",
+            "rssi": -88,
+            "device": {
+                "address": "xx:xx:xx:xx:xx:xx"
+            },
+            "syncData": {
+                "timestamp": 1598567007627,
+                "location": {
+                    "latitude": 53.4386691,
+                    "longitude": 15.1092313
+                }
+            },
+            "timestamp": 1598566704626
+        },
+        "type": "Feature"
+    }]
 }
 ```
-Payload will contain location of Android device from moment when data are sent and array of found devices, where each has information about:
-* Android's location when BT device was found
-* rssi
-* timestamp (time when device was found)
-* BT device information (MAC address and optional name if exposed)
+Payload will contain GeoJSON format of data with an array of features where: 
+* geometry will be point with coordinates of Android device from moment where BT device was found, 
+* properties object will contain information about BT device, time when was found and information about sync moment from Android device to cloud (location and time)
 
 2. WIFI networks endpoint
 ```json
 {
-  "location": {
-    "latitude": 53.3486734, 
-    "longitude": 13.0112315
-  }, 
-  "networks": [{ 
-    "rssi": -71,
-    "location": {
-      "latitude": 53.3486713, 
-      "longitude": 13.011213
-    },
-    "timestamp": 1595456722064, 
-    "network": {
-      "bssid": "xx:xx:xx:xx:xx:xx",
-      "ssid": "some name" 
-    } 
-  }] 
+    "type": "FeatureCollection",
+    "features": [
+        {
+            "geometry": {
+                "type": "Point",
+                "coordinates": [
+                    15.109267,
+                    53.3486779
+                ]
+            },
+            "properties": {
+                "name": "yyyyyyyy",
+                "rssi": -91,
+                "network": {
+                    "ssid": "yyyyyyy",
+                    "bssid": "xx:xx:xx:xx:xx:xx"
+                },
+                "syncData": {
+                    "timestamp": 1598566736896,
+                    "location": {
+                        "latitude": 53.3486779,
+                        "longitude": 15.109267
+                    }
+                },
+                "timestamp": 1598566736878
+            },
+            "type": "Feature"
+        }
+    ]
 }
 ```
-Payload will contain location of Android device from moment when data are sent and array of found networks, where each has information about:
-* Android's location when WIFI network was found
-* rssi
-* timestamp (time when network was found)
-* WIFI network information (BSSID and SSID)
+Payload will contain GeoJSON format, where each feature in array where:
+* geometry will be point with coordinates of Android device from moment where WIFI network was found, 
+* properties object will contain information about WIFI network, time when was found and information about sync moment from Android device to cloud (location and time)

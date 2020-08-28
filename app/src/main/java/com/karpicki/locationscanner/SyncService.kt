@@ -17,8 +17,8 @@ class SyncService: Service() {
 
     private var broadcastReceiver: BroadcastReceiver? = null
 
-    private val btMaxBufforSize: Int = 50
-    private val wifiMaxBufforSize: Int = 15
+    private val btMaxBufforSize: Int = 10
+    private val wifiMaxBufforSize: Int = 10
     private val numberOfLocationChangesToForceSync: Int = 3
     private var numberOfLocationChanges: Int = 0
 
@@ -52,8 +52,8 @@ class SyncService: Service() {
         }
 
         val btStoreTask = BTStoreTask()
-        val json = btStoreTask.stringify(location, bTDevicesToSync)
-        val json2 = btStoreTask.stringifyGeoJson(location, bTDevicesToSync)
+        //val json = btStoreTask.stringify(location, bTDevicesToSync)
+        val json = btStoreTask.stringifyGeoJson(location, bTDevicesToSync)
 
         val responseCode = btStoreTask.execute(json).get()
 
@@ -73,8 +73,8 @@ class SyncService: Service() {
         }
 
         val wifiStoreTask = WIFIStoreTask()
-        val json = wifiStoreTask.stringify(location, wifiDevicesToSync)
-        val json2 = wifiStoreTask.stringifyGeoJson(location, wifiDevicesToSync)
+        //val json = wifiStoreTask.stringify(location, wifiDevicesToSync)
+        val json = wifiStoreTask.stringifyGeoJson(location, wifiDevicesToSync)
 
         val responseCode = wifiStoreTask.execute(json).get()
 
