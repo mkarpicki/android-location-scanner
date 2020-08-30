@@ -2,40 +2,58 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
-def getBTStoreApiKey() {
+def getBTStoreXApiKey() {
     Properties properties = new Properties()
     properties.load(project.rootProject.file('local.properties').newDataInputStream())
-    return properties.getProperty("bt.storage.apiKey")
+    return properties.getProperty("bt.storage.headers.x-api-key")
 }
 
-def getBTStoreHost() {
+def getBTStoreAuthorization() {
     Properties properties = new Properties()
     properties.load(project.rootProject.file('local.properties').newDataInputStream())
-    return properties.getProperty("bt.storage.host")
+    return properties.getProperty("bt.storage.headers.authorization")
 }
 
-def getWIFIStoreApiKey() {
+def getBTStoreUrl() {
     Properties properties = new Properties()
     properties.load(project.rootProject.file('local.properties').newDataInputStream())
-    return properties.getProperty("wifi.storage.apiKey")
+    return properties.getProperty("bt.storage.url")
 }
 
-def getWIFIStoreHost() {
+def getWIFIStoreXApiKey() {
     Properties properties = new Properties()
     properties.load(project.rootProject.file('local.properties').newDataInputStream())
-    return properties.getProperty("wifi.storage.host")
+    return properties.getProperty("wifi.storage.headers.x-api-key")
 }
 
-def getIgnoredListApiKey() {
+def getWIFIStoreAuthorization() {
     Properties properties = new Properties()
     properties.load(project.rootProject.file('local.properties').newDataInputStream())
-    return properties.getProperty("ignored-list.apiKey")
+    return properties.getProperty("wifi.storage.headers.authorization")
 }
 
-def getIgnoredListHost() {
+def getWIFIStoreUrl() {
     Properties properties = new Properties()
     properties.load(project.rootProject.file('local.properties').newDataInputStream())
-    return properties.getProperty("ignored-list.host")
+    return properties.getProperty("wifi.storage.url")
+}
+
+def getIgnoredListXApiKey() {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    return properties.getProperty("ignored-list.headers.x-api-key")
+}
+
+def getIgnoredListUrl() {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    return properties.getProperty("ignored-list.url")
+}
+
+def getIgnoredListAuthorization() {
+    Properties properties = new Properties()
+    properties.load(project.rootProject.file('local.properties').newDataInputStream())
+    return properties.getProperty("ignored-list.headers.authorization")
 }
 
 android {
@@ -56,23 +74,36 @@ android {
     buildTypes {
 
         debug {
-            buildConfigField("String", "BT_STORE_API_KEY", "\""+getBTStoreApiKey()+"\"")
-            buildConfigField("String", "BT_STORE_HOST", "\""+getBTStoreHost()+"\"")
-            buildConfigField("String", "WIFI_STORE_API_KEY", "\""+getWIFIStoreApiKey()+"\"")
-            buildConfigField("String", "WIFI_STORE_HOST", "\""+getWIFIStoreHost()+"\"")
-            buildConfigField("String", "IGNORED_LIST_API_KEY", "\""+getIgnoredListApiKey()+"\"")
-            buildConfigField("String", "IGNORED_LIST_HOST", "\""+getIgnoredListHost()+"\"")
+            buildConfigField("String", "BT_STORE_X_API_KEY", "\""+getBTStoreXApiKey()+"\"")
+            buildConfigField("String", "BT_STORE_AUTHORIZATION", "\""+getBTStoreAuthorization()+"\"")
+            buildConfigField("String", "BT_STORE_URL", "\""+getBTStoreUrl()+"\"")
+
+            buildConfigField("String", "WIFI_STORE_X_API_KEY", "\""+getWIFIStoreXApiKey()+"\"")
+            buildConfigField("String", "WIFI_STORE_AUTHORIZATION", "\""+getWIFIStoreAuthorization()+"\"")
+            buildConfigField("String", "WIFI_STORE_URL", "\""+getWIFIStoreUrl()+"\"")
+
+            buildConfigField("String", "IGNORED_LIST_X_API_KEY", "\""+getIgnoredListXApiKey()+"\"")
+            buildConfigField("String", "IGNORED_LIST_AUTHORIZATION", "\""+getIgnoredListAuthorization()+"\"")
+            buildConfigField("String", "IGNORED_LIST_URL", "\""+getIgnoredListUrl()+"\"")
+
         }
 
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            buildConfigField("String", "BT_STORE_API_KEY", "\""+getBTStoreApiKey()+"\"")
-            buildConfigField("String", "BT_STORE_HOST", "\""+getBTStoreHost()+"\"")
-            buildConfigField("String", "WIFI_STORE_API_KEY", "\""+getWIFIStoreApiKey()+"\"")
-            buildConfigField("String", "WIFI_STORE_HOST", "\""+getWIFIStoreHost()+"\"")
-            buildConfigField("String", "IGNORED_LIST_API_KEY", "\""+getIgnoredListApiKey()+"\"")
-            buildConfigField("String", "IGNORED_LIST_HOST", "\""+getIgnoredListHost()+"\"")
+
+            buildConfigField("String", "BT_STORE_X_API_KEY", "\""+getBTStoreXApiKey()+"\"")
+            buildConfigField("String", "BT_STORE_AUTHORIZATION", "\""+getBTStoreAuthorization()+"\"")
+            buildConfigField("String", "BT_STORE_URL", "\""+getBTStoreUrl()+"\"")
+
+            buildConfigField("String", "WIFI_STORE_X_API_KEY", "\""+getWIFIStoreXApiKey()+"\"")
+            buildConfigField("String", "WIFI_STORE_AUTHORIZATION", "\""+getWIFIStoreAuthorization()+"\"")
+            buildConfigField("String", "WIFI_STORE_URL", "\""+getWIFIStoreUrl()+"\"")
+
+            buildConfigField("String", "IGNORED_LIST_X_API_KEY", "\""+getIgnoredListXApiKey()+"\"")
+            buildConfigField("String", "IGNORED_LIST_AUTHORIZATION", "\""+getIgnoredListAuthorization()+"\"")
+            buildConfigField("String", "IGNORED_LIST_URL", "\""+getIgnoredListUrl()+"\"")
+
         }
     }
 

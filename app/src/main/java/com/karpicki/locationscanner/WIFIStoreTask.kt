@@ -8,7 +8,7 @@ import java.lang.Exception
 
 class WIFIStoreTask: AsyncTask<String, Int, Int>() {
 
-    private val mediaType: MediaType? = MediaType.parse("application/json; charset=utf-8");
+    private val mediaType: MediaType? = MediaType.parse("application/geo+json; charset=utf-8");
 
     override fun doInBackground(vararg params: String?): Int? {
 
@@ -24,9 +24,10 @@ class WIFIStoreTask: AsyncTask<String, Int, Int>() {
             val body: RequestBody = RequestBody.create(mediaType, json)
 
             val request: Request = Request.Builder()
-                .url(BuildConfig.WIFI_STORE_HOST)
+                .url(BuildConfig.WIFI_STORE_URL)
                 .post(body)
-                .header("x-api-key", BuildConfig.WIFI_STORE_API_KEY )
+                .header("x-api-key", BuildConfig.WIFI_STORE_X_API_KEY )
+                .header("Authorization", BuildConfig.WIFI_STORE_AUTHORIZATION )
                 .build()
 
             val response: Response = client.newCall(request).execute()

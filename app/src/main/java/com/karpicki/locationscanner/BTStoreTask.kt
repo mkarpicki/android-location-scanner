@@ -8,7 +8,7 @@ import kotlin.collections.ArrayList
 
 class BTStoreTask : AsyncTask<String, Int, Int>() {
 
-    private val mediaType: MediaType? = MediaType.parse("application/json; charset=utf-8")
+    private val mediaType: MediaType? = MediaType.parse("application/geo+json; charset=utf-8")
 
     override fun doInBackground(vararg params: String?): Int? {
 
@@ -24,9 +24,10 @@ class BTStoreTask : AsyncTask<String, Int, Int>() {
             val body: RequestBody = RequestBody.create(mediaType, json)
 
             val request: Request = Request.Builder()
-                .url(BuildConfig.BT_STORE_HOST)
+                .url(BuildConfig.BT_STORE_URL)
                 .post(body)
-                .header("x-api-key", BuildConfig.BT_STORE_API_KEY )
+                .header("x-api-key", BuildConfig.BT_STORE_X_API_KEY )
+                .header("Authorization", BuildConfig.BT_STORE_AUTHORIZATION )
                 .build()
 
             val response: Response = client.newCall(request).execute()

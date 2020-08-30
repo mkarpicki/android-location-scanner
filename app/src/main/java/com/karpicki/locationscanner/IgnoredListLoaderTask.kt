@@ -35,9 +35,9 @@ class IgnoredListLoaderTask: AsyncTask<Void, Void, String>() {
             val client = OkHttpClient();
 
             val request: Request = Request.Builder()
-                .url(BuildConfig.IGNORED_LIST_HOST)
+                .url(BuildConfig.IGNORED_LIST_URL)
                 .get()
-                .header("x-api-key", BuildConfig.IGNORED_LIST_API_KEY )
+                .header("x-api-key", BuildConfig.IGNORED_LIST_X_API_KEY )
                 .build()
 
             val response: Response = client.newCall(request).execute()

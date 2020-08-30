@@ -60,7 +60,7 @@ class SyncService: Service() {
         Log.d("syncBTDevices:payload", json)
         Log.d("syncBTDevices:response_code", responseCode.toString())
 
-        if (responseCode == 201) {
+        if (responseCode in 200..299) {
             bTDevicesToSync.clear()
         }
         broadcastSaveStatus("bt_save_status", responseCode)
@@ -81,7 +81,7 @@ class SyncService: Service() {
         Log.d("syncWIFINetworks:payload", json)
         Log.d("syncWIFINetworks:response_code", responseCode.toString())
 
-        if (responseCode == 201) {
+        if (responseCode in 200..299) {
             wifiDevicesToSync.clear()
         }
         broadcastSaveStatus("wifi_save_status", responseCode)
