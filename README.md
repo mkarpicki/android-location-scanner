@@ -1,54 +1,48 @@
-### Description
-
+# Location Scanner
+## ( or MAC addresses scanner, which would be better name)    
+___  
 Location Scanner is a simple Android demo app, which will watch for:
-* Android's location update
+* Device's location update
 * Bluetooth devices around
-* WIFI Networks around
+* WIFI Networks around  
+  
 Scanned data will be sent to REST API(s).
 
 
-### Logic
-All the time scan for BT devices and collect them.  
-If array is bigger than 25 (currently hardcoded value), send to REST API with last known own location
+### App Logic description
 
-All the time scan for WIFI networks and collect them.  
-If array is bigger than 25 (currently hardcoded value), send to REST API with last known own location
+Application, after start will try to load list of MAC addresses to ignore (to avoid finding own smart watch or other device that can be in pocket).  
+If list will be loaded successfully, it will be saved in local file, so if there would be any failure during load in future (next time when app stats), local version can be used.
 
-All the time scan for location update (currently hardcoded minTime 3000ms and min distance 5m).  
-When position changed send collected BT devices and WIFI networks to REST APIs. 
+Application will be watching for Bluetooth MAC addresses and WIFI Networks around. When it will collect enough items (in each separate array), it will send it using REST service.  
+*Size of array(s) to collect items before sending is currently hardcoded in code.*
+
+In case application will not find enough devices to send, sync will happen after location change "n-th" time *(where "n" is also hardcoded currently)*
+
+Application will print found devices before syncing on screen (both lists are cleared after each successful response codes from REST API)  
+
 
 *TODO*  
 * *move hardcoded values to local.properties to overwrite defaults or even to be defined in UI*  
-* *add REST API(s) with lists of BT devices and WIFI networks to ignore (to not find own band or headphones all the time)*    
 
 ### Setup
 
-Modify or create local.properties file and add variables.
+To be able to run application, modify (or create) local.properties file and add variables.
 
 Pair of variables used for REST API where app will POST found BT devices.   
-`bt.storage.apiKey=...` - value for x-api-key Header sent with request  
-`bt.storage.host=...` - REST API endpoint which will expose POST method to consume devices  
+`bt.storage.headers.authorization=...` - value for x-api-key Header sent with request  
+`bt.storage.url=...` - REST API endpoint which will expose POST method to consume devices  
 
 Pair of variables used for REST API where app will POST found WIFI networks.         
-`wifi.storage.apiKey=...` - value for x-api-key Header sent with request  
-`wifi.storage.host=...` - REST API endpoint which will expose POST method to consume networks  
+`wifi.storage.headers.authorization=...` - value for x-api-key Header sent with request  
+`wifi.storage.url=...` - REST API endpoint which will expose POST method to consume networks  
 
 Pair of variables used for REST API which app can fetch list of devices to ignore when scanning  
-`ignored-list.apiKey=...` - value for x-api-key Header sent with request  
-`ignored-list.host=...` - REST API endpoint which will expose GET method to read list  
+`ignored-list.headers.x-api-key=...` - value for x-api-key Header sent with request  
+`ignored-list.url=...` - REST API endpoint which will expose GET method to read list  
 
-Expected `ignored-list` response:
-```json
-[
-  "xx:xx:xx:xx:xx:xx",
-  "yy:yy:yy:yy:yy:yy",
-  "..."
-]
 
-```
-> This config is optional. If not provided app will not use ifnored list.  
-
-### External requirement(s)
+### Additional (pre) requirements
 Create own REST API which will expose defined endpoints and consume GeoJSON data
 
 1. Bluetooth devices endpoint
@@ -82,9 +76,9 @@ Create own REST API which will expose defined endpoints and consume GeoJSON data
     }]
 }
 ```
-Payload will contain GeoJSON format of data with an array of features where: 
+Payload will expect GeoJSON format an array of features where: 
 * geometry will be point with coordinates of Android device from moment where BT device was found, 
-* properties object will contain information about BT device, time when was found and information about sync moment from Android device to cloud (location and time)
+* properties object will contain information about BT device, time when was found, rssi, MAC address, name (if exists) and information about sync moment from Android device to cloud (location and time)
 
 2. WIFI networks endpoint
 ```json
@@ -120,6 +114,16 @@ Payload will contain GeoJSON format of data with an array of features where:
     ]
 }
 ```
-Payload will contain GeoJSON format, where each feature in array where:
-* geometry will be point with coordinates of Android device from moment where WIFI network was found, 
-* properties object will contain information about WIFI network, time when was found and information about sync moment from Android device to cloud (location and time)
+Payload will contain GeoJSON format, where each feature in array contains:
+* geometry - point with coordinates of Android device from moment where WIFI network was found, 
+* properties object which contains information about WIFI network, time when was found, ssid, bssid, rssi and information about sync moment from Android device to cloud (location and time)
+
+3. Ignored addresses API which will expose GET endpoint and return aray of addresses as response:  
+```json
+[
+  "xx:xx:xx:xx:xx:xx",
+  "yy:yy:yy:yy:yy:yy",
+  "..."
+]
+
+```
