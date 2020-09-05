@@ -30,11 +30,11 @@ Application will print found devices before syncing on screen (both lists are cl
 To be able to run application, modify (or create) local.properties file and add variables.
 
 Pair of variables used for REST API where app will POST found BT devices.   
-`bt.storage.headers.authorization=...` - value for x-api-key Header sent with request  
+`bt.storage.headers.authorization=...` - value for Authorization Header sent with request  
 `bt.storage.url=...` - REST API endpoint which will expose POST method to consume devices  
 
 Pair of variables used for REST API where app will POST found WIFI networks.         
-`wifi.storage.headers.authorization=...` - value for x-api-key Header sent with request  
+`wifi.storage.headers.authorization=...` - value for Authorization Header sent with request  
 `wifi.storage.url=...` - REST API endpoint which will expose POST method to consume networks  
 
 Pair of variables used for REST API which app can fetch list of devices to ignore when scanning  
