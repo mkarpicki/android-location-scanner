@@ -1,7 +1,7 @@
 # Location Scanner
 ### (or MAC addresses scanner, which would be better name)    
 ___  
-Location Scanner is a simple Android demo app, which will watch for:
+Location Scanner is a simple PoC Android app, which will watch for:
 * Device's location update
 * Bluetooth devices around
 * WIFI Networks around  
