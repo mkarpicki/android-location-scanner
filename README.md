@@ -27,7 +27,7 @@ Application will print found devices before syncing on screen (both lists are cl
 
 ### Setup
 
-To be able to run application, modify (or create) local.properties file and add variables.
+To be able to run application, modify (or create) `local.properties` file and add variables.
 
 Pair of variables used for REST API where app will POST found BT devices.   
 `bt.storage.headers.authorization=...` - value for Authorization Header sent with request  
