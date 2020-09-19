@@ -17,7 +17,7 @@ class SyncService: Service() {
 
     private var broadcastReceiver: BroadcastReceiver? = null
 
-    private val btMaxBufforSize: Int = 10
+    private val btMaxBufforSize: Int = 50
     private val wifiMaxBufforSize: Int = 10
     private val numberOfLocationChangesToForceSync: Int = 3
     private var numberOfLocationChanges: Int = 0
