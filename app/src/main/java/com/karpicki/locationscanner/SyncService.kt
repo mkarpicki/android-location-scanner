@@ -17,8 +17,8 @@ class SyncService: Service() {
 
     private var broadcastReceiver: BroadcastReceiver? = null
 
-    private val btMaxBufforSize: Int = 50
-    private val wifiMaxBufforSize: Int = 10
+    private val btMaxBufferSize: Int = 50
+    private val wifiMaxBufferSize: Int = 10
     private val numberOfLocationChangesToForceSync: Int = 3
     private var numberOfLocationChanges: Int = 0
 
@@ -110,12 +110,12 @@ class SyncService: Service() {
     }
 
     private fun collectedEnoughWIFINetworks () :Boolean {
-        return (wifiDevicesToSync.size >= wifiMaxBufforSize && lastLocation != null)
+        return (wifiDevicesToSync.size >= wifiMaxBufferSize && lastLocation != null)
     }
 
 
     private fun collectedEnoughBTDevices () :Boolean {
-        return (bTDevicesToSync.size >= btMaxBufforSize && lastLocation != null)
+        return (bTDevicesToSync.size >= btMaxBufferSize && lastLocation != null)
     }
 
     private fun syncAll(location: Location?) {
