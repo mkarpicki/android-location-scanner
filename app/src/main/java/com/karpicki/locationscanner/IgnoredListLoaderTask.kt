@@ -1,5 +1,6 @@
 package com.karpicki.locationscanner
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
@@ -13,12 +14,9 @@ import org.json.JSONException
 
 import org.json.JSONObject
 
-
-
-
-
 class IgnoredListLoaderTask: AsyncTask<Void, Void, String>() {
 
+    @SuppressLint("StaticFieldLeak")
     private lateinit var context: Context
     private val IGNORED_LIST = "ignored_list"
 
@@ -26,7 +24,7 @@ class IgnoredListLoaderTask: AsyncTask<Void, Void, String>() {
         this.context = context
     }
 
-    override fun doInBackground(vararg params: Void?): String? {
+    override fun doInBackground(vararg params: Void?): String {
 
         var responseStr = "{\"wifi\": [], \"bt\": []}"
 
